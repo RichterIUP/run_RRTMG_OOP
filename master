@@ -1,0 +1,23 @@
+#!/bin/bash
+#SBATCH -n 1
+#SBATCH -N 1
+#SBATCH -t 4320
+#SBATCH -p all
+#SBATCH --mem=9000
+#SBATCH --open-mode=append
+
+#export LBL_HOME=/home/phi.richter/radiative_transfer/lblrtm
+module unuse /home/eb/modules/all
+module unuse /home/eb/modules/LAMOS
+module use /home/eb/modules/_legacy/all
+module load Python
+module load netcdf4-python
+module load matplotlib
+
+sbatch RRTMG /mnt/beegfs/user/phi.richter/DATA_PHD/FTIR/TCWret/retrievals_single/Polarstern_retrievals_diff_shape/droxtals/RESULTS/ \
+            /mnt/beegfs/user/phi.richter/DATA_PHD/FTIR/PASCAL_SiPCA_FRAM_2017/radiance \
+            /home/phi.richter/SOFTWARE_PHD/Total_Cloud_Water_retrieval/ssp_database/ssp_db.Droxtal.gamma.0p100 \
+            /home/phi.richter/SOFTWARE_PHD/Total_Cloud_Water_retrieval/ssp_database/ssp_db.mie_wat.gamma_sigma_0p100 \
+            /home/phi.richter/Code/RRTMG/models/rrtmg_lw_v5.00_linux_ifort \
+            /home/phi.richter/Code/RRTMG_SW/build/rrtmg_sw_v5.00_linux_pgi \
+            droxtal

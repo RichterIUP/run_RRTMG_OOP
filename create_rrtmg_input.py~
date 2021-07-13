@@ -1,0 +1,481 @@
+#!/usr/bin/python37
+import numpy as np
+import datetime as dt
+import pandas as pd
+
+def in_cld_rrtm(lay_liq, lay_ice, cwp, rliq, rice, fice, clt):     
+    # =============================================================================
+    #  RECORD C1.1
+    # 	
+    #       INFLAG, ICEFLAG, LIQFLAG
+    # 
+    #            5       10       15
+    # 
+    #       4X, I1,  4X, I1,  4X, I1
+    # 
+    # 
+    #       Note:  ICEFLAG and LIQFLAG are required only if INFLAG = 2.
+    # 
+    #             INFLAG = 0 direct specification of optical depths of clouds;
+    #                        cloud fraction and cloud optical depth (gray), single scattering albedo,
+    # 		       and N-str moments of the phase function
+    # 
+    #                    = 2 calculation of separate ice and liquid cloud optical depths, with
+    #                        parameterizations determined by values of ICEFLAG and LIQFLAG. 
+    #                        Cloud fraction, cloud water path, cloud ice fraction, and
+    #                        effective ice radius are input for each cloudy layer for all 
+    #                        parameterizations.  If LIQFLAG = 1, effective liquid droplet radius
+    #                        is also needed.  If ICEFLAG = 1, generalized effective size is
+    # 		       is also needed.
+    INFLAG = 2
+    # 
+    #             ICEFLAG = 0 inactive
+    #                     = 1 the optical depths (non-gray) due to ice clouds are computed as closely as
+    #                         possible to the method in E.E. Ebert and J.A. Curry, JGR, 97, 3831-3836 (1992).
+    #                     = 2 the optical properties are computed by a method based on the parameterization
+    #                         of spherical ice particles in the RT code, STREAMER v3.0 (Reference: 
+    #                         Key. J., Streamer User's Guide, Cooperative Institute for
+    #                         Meteorological Satellite Studies, 2001, 96 pp.).
+    #                     = 3 the optical depths are computed by a method based on the parameterization
+    # 			of ice clouds due to Q. Fu, J. Clim., 9, 2058 (1996).
+    ICEFLAG = 1
+    # 
+    #             LIQFLAG = 0 inactive
+    #                     = 1 the optical depths (non-gray) due to water clouds are computed by a method
+    #                         based on the parameterization of water clouds due to Y.X. Hu and K. Stamnes,
+    #                         J. Clim., 6, 728-742 (1993).
+    LIQFLAG = 1
+    #                        
+    # 	     These methods are further detailed in the comments in the file 'rrtmg_sw_cldprop.F90'
+    #              and the module 'rrtmg_sw_susrtop.F90'.
+    # 
+    RECORD_C1_1  = 4 * " " + "{:1d}".format(INFLAG)
+    RECORD_C1_1 += 4 * " " + "{:1d}".format(ICEFLAG)
+    RECORD_C1_1 += 4 * " " + "{:1d}".format(LIQFLAG)
+
+    #  RECORD C1.3  (one record for each cloudy layer, INFLAG = 2)
+    # 
+    #       TESTCHAR,    LAY, CLDFRAC,   TAUCLD or CWP, FRACICE, EFFSIZEICE, EFFSIZELIQ
+    # 
+    #              1,    3-5,    6-15,           16-25,   26-35,     36-45,     46-55
+    # 
+    #             A1, 1X, I3,   E10.5,           E10.5,   E10.5,     E10.5,     E10.5
+    # 
+    # 
+    #             TESTCHAR   control character -- if equal to '%', cloud input processing
+    #                        is terminated
+    # 
+    #             LAY        layer number of cloudy layer.  The layer numbering refers to the
+    #                        ordering for the upward radiative transfer, i.e. botton to top.
+    #                        For IATM = 0 (Record 1.2), each layer's number is equal to the  
+    #                        position of its Record 2.1.1 in the grouping of these records.
+    #                        For example, the second Record 2.1.1 occurring after Record 2.1
+    #                        corresponds to the second layer.  For IATM = 1 (Record 1.2) and 
+    #                        IBMAX > 0 (Record 3.1), layer n corresponds to the region between 
+    #                        altitudes n and n+1 in the list of layer boundaries in Record 3.3B.  
+    #                        For IATM = 1 (Record 1.2) and IBMAX = 0 (Record 3.1), the layer 
+    #                        numbers can be determined by running RRTM for the cloudless case
+    #                        and examining the TAPE6 output from this run.
+    #                        
+    #             CLDFRAC    cloud fraction for the layer.
+    # 
+    #             TAUCLD     (INFLAG = 0 only) total (ice and water) optical depth for the layer
+    #      or     CWP        (INFLAG > 0) cloud water path for the layer (g/m2)
+    # 
+    #             FRACICE    (INFLAG = 2) fraction of the layer's cloud water path in the form
+    #                        of ice particles  
+    # 
+    #             EFFSIZEICE (INFLAG = 2 and ICEFLAG = 1) Effective radius of spherical  
+    # 	               ice crystals with equivalent projected area to hexagonal ice particles
+    # 	               following Ebert and Curry (1992).
+    # 	               Valid sizes are 13.0 - 130.0 microns. 
+    #                   
+    #                        (INFLAG = 2 and ICEFLAG = 2) Effective radius of spherical  
+    # 	               ice crystals, re (see STREAMER manual for definition of this parameter)
+    # 	               Valid sizes are 5.0 - 131.0 microns. 
+    #                   
+    #                        (INFLAG = 2 and ICEFLAG = 3) Generalized effective size of hexagonal
+    # 	               ice crystals, dge (see Q. Fu, 1996, for definition of this parameter)
+    # 	               Valid sizes are 5.0 - 140.0 microns.  
+    # 
+    # 		       NOTE: The size descriptions for effective radius and generalized effective
+    # 		       size are NOT equivalent.  See the particular references for the appropriate 
+    # 		       definition.
+    # 
+    #             EFFSIZELIQ (INFLAG = 2 and LIQFLAG = 1) Liquid droplet effective radius, re (microns) 
+    #                        Valid sizes are 2.5 - 60.0 microns.
+    CLDFRAC = clt
+    FRACICE = fice
+    EFFSIZEICE = rice
+    EFFSIZELIQ = rliq
+    RECORD_C1_3 = ""
+    CWP = cwp
+    ii = 0
+    
+    for lay in list(np.union1d(lay_liq, lay_ice)):
+        RECORD_C1_3 += " "
+        RECORD_C1_3 += 1 * " " + "{:3d}".format(lay)
+        RECORD_C1_3 += "{:>10.5f}".format(CLDFRAC[ii])
+        RECORD_C1_3 += "{:>10.5f}".format(CWP[ii])
+        RECORD_C1_3 += "{:>10.5f}".format(FRACICE[ii])
+        RECORD_C1_3 += "{:>10.5f}".format(EFFSIZEICE[ii])
+        RECORD_C1_3 += "{:>10.5f}".format(EFFSIZELIQ[ii])
+        RECORD_C1_3 += "\n"
+        ii += 1
+    RECORD_C1_3 += "%"
+    
+    return RECORD_C1_1 + "\n" + RECORD_C1_3
+
+def input_rrtm(height_prof, pressure_prof, humidity_prof, temperature_prof, semiss=0.99, window=99):
+    # Record 1.1
+    
+    CXID = "$ RRTM_LW runscript created on {}".format(dt.datetime.now())
+    
+    RECORD_1_1 = "{:80s}".format(CXID)
+    
+    #      RECORD 1.2
+     
+    #       IAER,    IATM,  IXSECT, NUMANGS,   IOUT,  IDRV,  IMCA, ICLD
+     
+    #         20,      50,      70,   84-85,  88-90,    92,    94,   95   
+     
+    #    18x, I2, 29X, I1, 19X, I1, 13X, I2, 2X, I3, 1X,I1,1X, I1,   I1
+     
+     
+    # 	  IAER   (0,10)   flag for aerosols
+    #                   = 0   no layers contain aerosols
+    #                   = 10  one or more layers contain aerosols (only absorption is treated)
+    #                        (requires the presence of file IN_AER_RRTM)
+
+    IAER = 0
+    # 	  IATM   (0,1)   flag for RRTATM    1 = yes
+    IATM = 1
+    # 	  IXSECT (0,1) flag for cross-sections
+    #                   = 0  no cross-sections included in calculation
+    #                   = 1  cross-sections included in calculation
+    IXSECT = 0
+    #           NUMANGS = 0  radiance will be computed at 1 angle, the cosine of which
+    #                        equals 1/1.66 (standard diffusivity angle approximation)
+    #                        (default and only option available)
+    NUMANGS = 0
+    # 	  IOUT = -1 if no output is to be printed out.
+    # 	       =  0 if the only output is for 10-3250 cm-1.
+    # 	       =  n (n = 1-16) if the only output is from band n.
+    # 		    For the wavenumbers for each band, see Table I.
+    # 	       = 99 if output is generated for 17 spectral intervals, one
+    # 		    for the full longwave spectrum (10-3250 cm-1), and one 
+    # 		    for each of the 16 bands.
+    IOUT = window
+    # 	  IDRV   (0,1) flag for applying optional adjustment to the upward flux at
+    #                        each layer based on the derivative of the Planck function 
+    #                        with respect to temperature for the change in surface 
+    #                        temperature (DTBOUND) provided on record 1.4.1 relative to
+    #                        the surface temperature (TBOUND) provided on record 1.4
+    #                   = 0  standard forward calculation; do not apply derivative 
+    #                        adjustment (default)
+    #                   = 1  adjust upward flux at each layer based on derivative of 
+    #                        the Planck function to account for the change in surface
+    # 		       temperature defined by DTBOUND
+    IDRV = 0
+    # 	  IMCA   (0,1) flag for McICA (Monte Carlo Independent Column Approximation)
+    #                        for statistical representation of sub-grid cloud fraction 
+    #                        and cloud overlap
+    #                   = 0  standard forward calculation; do not use McICA
+    #                   = 1  use McICA (will perform statistical sample of 200 forward
+    # 		       calculations and output average flux and heating rates)
+    IMCA = 1
+    # 	  ICLD   (0,1,2,3,4,5) flag for clouds
+    #                   = 0  no cloudy layers in atmosphere
+    #                   = 1  one or more cloudy layers present in atmosphere.  Cloud layers
+    # 		       are treated using a RANDOM overlap assmption.
+    #                        (requires the presence of file IN_CLD_RRTM for column model)
+    #                        (available for IMCA = 0 or 1)
+    #                   = 2  one or more cloudy layers present in atmosphere.  Cloud layers
+    # 		       are treated using a MAXIMUM/RANDOM overlap assmption.
+    #                        (requires the presence of file IN_CLD_RRTM for column model)
+    #                        (available for IMCA = 0 or 1)
+    #                   = 3  one or more cloudy layers present in atmosphere.  Cloud layers
+    # 		       are treated using a MAXIMUM overlap assmption.
+    #                        (requires the presence of file IN_CLD_RRTM for column model)
+    #                        (available only for IMCA = 1)
+    #                   = 4  one or more cloudy layers present in atmosphere.  Cloud layers
+    # 		       are treated using a EXPONENTIAL overlap assmption.
+    #                        (requires the presence of file IN_CLD_RRTM for column model,
+    #                        and inputs set on Records 1.5 and either 1.5.1 or 1.5.2)
+    #                        (available only for IMCA = 1)
+    #                   = 5  one or more cloudy layers present in atmosphere.  Cloud layers
+    # 		       are treated using a EXPONENTIAL-RANDOM overlap assmption.
+    #                        (requires the presence of file IN_CLD_RRTM for column model,
+    #                        and inputs set on Records 1.5 and either 1.5.1 or 1.5.2)
+    #                        (available only for IMCA = 1)
+    ICLD = 2
+    
+    RECORD_1_2  = 18 * " " + "{:2d}".format(IAER)
+    RECORD_1_2 += 29 * " " + "{:1d}".format(IATM)
+    RECORD_1_2 += 19 * " " + "{:1d}".format(IXSECT)
+    RECORD_1_2 += 13 * " " + "{:2d}".format(NUMANGS)
+    RECORD_1_2 += 2  * " " + "{:3d}".format(IOUT)
+    RECORD_1_2 += 1  * " " + "{:1d}".format(IDRV)
+    RECORD_1_2 += 1  * " " + "{:1d}".format(IMCA)
+    RECORD_1_2 += 0  * " " + "{:1d}".format(ICLD)
+    
+    # RECORD 1.4  
+  
+    #TBOUND,  IEMIS, IREFLECT, (SEMISS(IB),IB=1,16)
+ 
+    #      1-10,     12,       15,        16-95
+ 
+    #     E10.3  1X, I1,   2X, I1,        16E5.3
+ 
+ 
+    #     TBOUND   temperature at the surface.  If input value < 0, then surface temperature
+    #              is set to the temperature at the bottom of the first layer (see Record 2.1.1)
+    TBOUND = temperature_prof[0]
+    #     IEMIS  = 0 each band has surface emissivity equal to 1.0
+    #            = 1 each band has the same surface emissivity (equal to SEMISS(16)) 
+    #            = 2 each band has different surface emissivity (for band IB, equal to SEMISS(IB))
+    IEMIS = 1
+
+    #     IREFLECT = 0 for Lambertian reflection at surface, i.e. reflected radiance 
+    #		is equal at all angles
+    #              = 1 for specular reflection at surface, i.e. reflected radiance at angle
+	#		is equal to downward surface radiance at same angle multiplied by
+	#		the reflectance.  THIS OPTION CURRENTLY NOT IMPLEMENTED.
+    IREFLECT = 0
+    #     SEMISS   the surface emissivity for each band (see Table I).  All values must be 
+    #              greater than 0 and less than or equal to 1.  If IEMIS = 1, only
+    #              the first value of SEMISS (SEMISS(16)) is considered.  If IEMIS = 2 
+    #              and no surface emissivity value is given for SEMISS(IB), a value of 1.0 
+    #              is used for band IB.
+    SEMISS = [semiss]
+    RECORD_1_4  = "{:>10.3f}".format(TBOUND) 
+    RECORD_1_4 += 1  * " " + "{:1d}".format(IEMIS)
+    RECORD_1_4 += 2  * " " + "{:1d}".format(IREFLECT)
+    for element in SEMISS:
+        RECORD_1_4 += "{:>5.3f}".format(element)
+        
+    # ****************************************************************************
+    #********     these records applicable if RRTATM selected (IATM=1)    ********
+ 
+    #RECORD 3.1
+ 
+ 
+    #  MODEL,   IBMAX,  NOPRNT,  NMOL, IPUNCH,   MUNITS,    RE,      CO2MX
+ 
+    #      5,      15,      25,    30,     35,    39-40, 41-50,      71-80
+
+    #     I5,  5X, I5,  5X, I5,    I5,     I5,   3X, I2, F10.3, 20X, F10.3
+ 
+ 
+    #       MODEL   selects atmospheric profile
+ 
+    #                 = 0  user supplied atmospheric profile
+    #                 = 1  tropical model
+    #                 = 2  midlatitude summer model
+    #                 = 3  midlatitude winter model
+    #                 = 4  subarctic summer model
+    #                 = 5  subarctic winter model
+    #                 = 6  U.S. standard 1976
+    MODEL = 0
+ 
+    #       IBMAX     selects layering for RRTM
+ 
+    #                 = 0  RRTM layers are generated internally (default)
+    #                 > 0  IBMAX is the number of layer boundaries read in on Record 3.3B which are
+    #                             used to define the layers used in RRTM calculation
+    IBMAX = len(height_prof)
+    #       NOPRNT    = 0  full printout
+    #                 = 1  selects short printout
+    NOPRINT = 0
+    #       NMOL      number of molecular species (default = 7; maximum value is 35)
+    NMOL = 7
+    #       IPUNCH    = 0  layer data not written (default)
+    #                 = 1  layer data written to unit IPU (TAPE7)
+    IPUNCH = 1
+    #       MUNITS    = 0  write molecular column amounts to TAPE7 (if IPUNCH = 1, default)
+    #                 = 1  write molecular mixing ratios to TAPE7 (if IPUNCH = 1)
+    MUNITS = 1
+    #       RE        radius of earth (km)
+	#                defaults for RE=0: 
+    #    	        a)  MODEL 0,2,3,6    RE = 6371.23 km
+    #			b)        1          RE = 6378.39 km
+	#		c)        4,5        RE = 6356.91 km
+    RE = 0
+
+    RECORD_3_1  = "{:5d}".format(MODEL)
+    RECORD_3_1 += 5 * " " + "{:5d}".format(IBMAX) 
+    RECORD_3_1 += 5 * " " + "{:5d}".format(NOPRINT)
+    RECORD_3_1 += "{:5d}".format(NMOL)
+    RECORD_3_1 += "{:5d}".format(IPUNCH)
+    RECORD_3_1 += 3 * " " + "{:2d}".format(MUNITS)
+    RECORD_3_1 += "{:10.3f}".format(RE)
+
+    #   RECORD 3.2
+ 
+ 
+    #     HBOUND,   HTOA
+ 
+    #       1-10,  11-20
+ 
+    #      F10.3,  F10.3
+  
+ 
+    #      HBOUND     altitude of the surface (km)
+    HBOUND = height_prof[0]
+    
+    #      HTOA       altitude of the top of the atmosphere (km)
+    HTOA = height_prof[-1]
+    
+    RECORD_3_2 = "{:10.3f}{:10.3f}".format(HBOUND, HTOA)
+    
+    # RECORD 3.3B        For IBMAX > 0  (from RECORD 3.1)
+ 
+    #            ZBND(I), I=1, IBMAX   altitudes of RRTM layer boundaries
+ 
+    #           (8F10.3)
+
+ 	#            If IBMAX < 0 
+
+	#	PBND(I), I=1, ABS(IBMAX) pressures of LBLRTM layer boundaries
+
+    #           (8F10.3)
+    
+    ZBND = ""
+    for ii in range(len(height_prof)):
+    
+            ZBND += "{:10.3f}".format(height_prof[ii])
+            if ii % 8 == 7:
+                ZBND += "\n"
+    
+    RECORD_3_3B = ZBND
+    
+    # RECORD 3.4
+    
+    #           IMMAX,   HMOD
+ 
+    #           5,   6-29
+ 
+    #          I5,    3A8
+ 
+ 
+    #       IMMAX    number of atmospheric profile boundaries
+
+    #                If IMMAX is set to a negative value, the level boundaries are
+    #                specified in PRESSURE (mbars).
+    IMMAX = len(height_prof)
+    #       HMOD    24 character description of profile
+    HMOD = ""
+    
+    # RECORD 3.5
+ 
+ 
+    #   ZM,    PM,    TM,    JCHARP, JCHART,   (JCHAR(K),K =1,28)
+ 
+    # 1-10, 11-20, 21-30,        36,     37,     41  through  68
+ 
+    #E10.3, E10.3, E10.3,   5x,  A1,     A1,    3X,    28A1
+ 
+ 
+    #      ZM       boundary altitude (km). If IMMAX < 0, altitude levels are 
+	#	   computed from pressure levels PM. If any altitude levels are
+	#	   provided, they are ignored if  IMMAX < 0 (exception: The
+	#	   first input level must have an accompanying ZM for input
+	#	   into the hydrostatic equation)
+    ZM = height_prof
+ 
+    #      PM       pressure (units and input options set by JCHARP)
+    PM = pressure_prof
+    
+    #      TM       temperature (units and input options set by JCHART)
+    TM = temperature_prof
+    
+    #  JCHARP       flag for units and input options for pressure (see Table II)
+    JCHARP = "A"
+    #  JCHART       flag for units and input options for temperature (see Table II)
+    JCHART = "A"
+    #  JCHAR(K)     flag for units and input options for
+    #               the K'th molecule (see Table II)
+    #A -> ppmv, B -> cm-3, C -> g/kg, D -> g/m3 (so kann man retrievte Spurengase verwenden) H -> % (relative Humidity)
+    # ( 1)  H2O  ( 2)  CO2  ( 3)    O3 ( 4)   N2O ( 5)    CO ( 6)   CH4 ( 7)    O2
+    #with open("/home/phi.richter/Code/run_RRTMG/atmosphere", "r") as f:
+    #    JCHAR = f.readline().rstrip()
+    JCHAR = "H444444"
+    #JCHAR = "C555555"
+     
+    #RECORD 3.6.1 ... 3.6.N
+ 
+    #      VMOL(K), K=1, NMOL
+ 
+    #      8E10.3
+ 
+    #      VMOL(K) density of the K'th molecule in units set by JCHAR(K)
+    RECORD_3_5_6 = ""
+    VOL = np.array([np.zeros(len(height_prof)) for ii in range(7)])
+    VOL[0] = humidity_prof
+    for loop in range(len(height_prof)):
+        RECORD_3_5_6 += "{:10.3E}".format(ZM[loop])
+        RECORD_3_5_6 += "{:10.3E}".format(PM[loop])
+        RECORD_3_5_6 += "{:10.3f}".format(TM[loop])
+        RECORD_3_5_6 += 5 * " " + "{:1s}".format(JCHARP) + "{:1s}".format(JCHART)
+        RECORD_3_5_6 += 3 * " " + "{}".format(JCHAR)
+        RECORD_3_5_6 += "\n"
+        for molecules in range(7):
+            RECORD_3_5_6 += "{:10.3E}".format(VOL[molecules][loop])
+        RECORD_3_5_6 += "\n"
+    # REPEAT records 3.5 and 3.6.1 to 3.6.N for each of the remaining IMMAX boundaries
+        
+    RECORD_3_4 = "{:5d}".format(IMMAX) + "{:24s}".format(HMOD)
+    return RECORD_1_1 + "\n" + RECORD_1_2 + "\n" + RECORD_1_4 + "\n" + \
+            RECORD_3_1 + "\n" + RECORD_3_2 + "\n" + RECORD_3_3B + "\n" + RECORD_3_4 + "\n" + \
+            RECORD_3_5_6
+            
+def read_results(layer, keys, fname="OUTPUT_RRTM"):
+    '''
+    Read output files of RRTMG and save all data corresponding to the keys KEYS_SW and keys_LW
+    '''
+    spec_range = "lw"
+    with open(fname, "r") as f:
+        cont = f.readlines()
+        
+    header = []
+    for line in cont:
+        #print(line)
+        
+        ## find header
+        if "LEVEL" in line:
+            for element in line.split("  "):
+                if len(element) > 0:
+                    if element.rstrip().lstrip() == "LEVEL PRESSURE":
+                        text = "LEVEL"
+                        header.append(text)
+                        text = "PRESSURE"
+                        header.append(text)
+                    else:
+                        text = element.rstrip().lstrip()
+                        header.append(text)
+                        
+     
+    for ii in range(len(cont)):
+        if "LEVEL" in cont[ii]:
+            start = ii+2
+        if " 0 " in cont[ii]:
+            end = ii+1
+
+
+    col = [[] for ii in range(len(header))]
+
+    for line in cont[start:end]:
+        ii = 0
+        for element in line.split(" "):
+            if len(element) > 0:
+                if "*" in element:
+                    col[ii].append(0)
+                else:
+                    col[ii].append(float(element))
+                ii += 1
+    col = np.array(col)
+    out = dict()
+    for key in range(len(header)):
+        out.update({header[key]: col[key, :]})
+    out = pd.DataFrame(out)
+    return out
