@@ -14,10 +14,74 @@ module load Python
 module load netcdf4-python
 module load matplotlib
 
-sbatch RRTMG /mnt/beegfs/user/phi.richter/DATA_PHD/FTIR/TCWret/retrievals_single/Polarstern_retrievals_diff_shape/droxtals/RESULTS/ \
-            /mnt/beegfs/user/phi.richter/DATA_PHD/FTIR/PASCAL_SiPCA_FRAM_2017/radiance \
+sbatch RRTMG /mnt/beegfs/user/phi.richter/DATA_PHD/FTIR/FTIR/TCWret/retrievals_single/Polarstern_retrievals_diff_shape/droxtals/RESULTS/ \
+            /mnt/beegfs/user/phi.richter/DATA_PHD/FTIR/FTIR/PASCAL_SiPCA_FRAM_2017/radiance \
             /home/phi.richter/SOFTWARE_PHD/Total_Cloud_Water_retrieval/ssp_database/ssp_db.Droxtal.gamma.0p100 \
             /home/phi.richter/SOFTWARE_PHD/Total_Cloud_Water_retrieval/ssp_database/ssp_db.mie_wat.gamma_sigma_0p100 \
-            /home/phi.richter/Code/RRTMG/models/rrtmg_lw_v5.00_linux_ifort \
-            /home/phi.richter/Code/RRTMG_SW/build/rrtmg_sw_v5.00_linux_pgi \
+            /home/phi.richter/RRTMG/RRTMG_LW/build/rrtmg_lw_v5.00_linux_ifort \
+            /home/phi.richter/RRTMG_SW/RRTMG_SW/build/rrtmg_sw_v5.00_linux_pgi_aerosols \
             droxtal
+            
+sbatch RRTMG /mnt/beegfs/user/phi.richter/DATA_PHD/FTIR/FTIR/TCWret/retrievals_single/Polarstern_retrievals_diff_shape/droxtals2/RESULTS/ \
+            /mnt/beegfs/user/phi.richter/DATA_PHD/FTIR/FTIR/PASCAL_SiPCA_FRAM_2017/radiance \
+            /home/phi.richter/SOFTWARE_PHD/Total_Cloud_Water_retrieval/ssp_database/ssp_db.Droxtal.gamma.0p100 \
+            /home/phi.richter/SOFTWARE_PHD/Total_Cloud_Water_retrieval/ssp_database/ssp_db.mie_wat.gamma_sigma_0p100 \
+            /home/phi.richter/RRTMG/RRTMG_LW/build/rrtmg_lw_v5.00_linux_ifort \
+            /home/phi.richter/RRTMG_SW/RRTMG_SW/build/rrtmg_sw_v5.00_linux_pgi_aerosols \
+            droxtal2
+            
+sbatch RRTMG /mnt/beegfs/user/phi.richter/DATA_PHD/FTIR/FTIR/TCWret/retrievals_single/Polarstern_retrievals_diff_shape/aggregate/RESULTS/ \
+            /mnt/beegfs/user/phi.richter/DATA_PHD/FTIR/FTIR/PASCAL_SiPCA_FRAM_2017/radiance \
+            /home/phi.richter/SOFTWARE_PHD/Total_Cloud_Water_retrieval/ssp_database/ssp_db.Aggregate.gamma.0p100 \
+            /home/phi.richter/SOFTWARE_PHD/Total_Cloud_Water_retrieval/ssp_database/ssp_db.mie_wat.gamma_sigma_0p100 \
+            /home/phi.richter/RRTMG/RRTMG_LW/build/rrtmg_lw_v5.00_linux_ifort \
+            /home/phi.richter/RRTMG_SW/RRTMG_SW/build/rrtmg_sw_v5.00_linux_pgi_aerosols \
+            aggregate
+            
+sbatch RRTMG /mnt/beegfs/user/phi.richter/DATA_PHD/FTIR/FTIR/TCWret/retrievals_single/Polarstern_retrievals_diff_shape/bulletrosette/RESULTS/ \
+            /mnt/beegfs/user/phi.richter/DATA_PHD/FTIR/FTIR/PASCAL_SiPCA_FRAM_2017/radiance \
+            /home/phi.richter/SOFTWARE_PHD/Total_Cloud_Water_retrieval/ssp_database/ssp_db.BulletRosette.gamma.0p100 \
+            /home/phi.richter/SOFTWARE_PHD/Total_Cloud_Water_retrieval/ssp_database/ssp_db.mie_wat.gamma_sigma_0p100 \
+            /home/phi.richter/RRTMG/RRTMG_LW/build/rrtmg_lw_v5.00_linux_ifort \
+            /home/phi.richter/RRTMG_SW/RRTMG_SW/build/rrtmg_sw_v5.00_linux_pgi_aerosols \
+            bulletrosette
+            
+sbatch RRTMG /mnt/beegfs/user/phi.richter/DATA_PHD/FTIR/FTIR/TCWret/retrievals_single/Polarstern_retrievals_diff_shape/hollowcol/RESULTS/ \
+            /mnt/beegfs/user/phi.richter/DATA_PHD/FTIR/FTIR/PASCAL_SiPCA_FRAM_2017/radiance \
+            /home/phi.richter/SOFTWARE_PHD/Total_Cloud_Water_retrieval/ssp_database/ssp_db.HollowCol.gamma.0p100 \
+            /home/phi.richter/SOFTWARE_PHD/Total_Cloud_Water_retrieval/ssp_database/ssp_db.mie_wat.gamma_sigma_0p100 \
+            /home/phi.richter/RRTMG/RRTMG_LW/build/rrtmg_lw_v5.00_linux_ifort \
+            /home/phi.richter/RRTMG_SW/RRTMG_SW/build/rrtmg_sw_v5.00_linux_pgi_aerosols \
+            hollowcol
+            
+sbatch RRTMG /mnt/beegfs/user/phi.richter/DATA_PHD/FTIR/FTIR/TCWret/retrievals_single/Polarstern_retrievals_diff_shape/plates/RESULTS/ \
+            /mnt/beegfs/user/phi.richter/DATA_PHD/FTIR/FTIR/PASCAL_SiPCA_FRAM_2017/radiance \
+            /home/phi.richter/SOFTWARE_PHD/Total_Cloud_Water_retrieval/ssp_database/ssp_db.Plates.gamma.0p100 \
+            /home/phi.richter/SOFTWARE_PHD/Total_Cloud_Water_retrieval/ssp_database/ssp_db.mie_wat.gamma_sigma_0p100 \
+            /home/phi.richter/RRTMG/RRTMG_LW/build/rrtmg_lw_v5.00_linux_ifort \
+            /home/phi.richter/RRTMG_SW/RRTMG_SW/build/rrtmg_sw_v5.00_linux_pgi_aerosols \
+            plates
+            
+sbatch RRTMG /mnt/beegfs/user/phi.richter/DATA_PHD/FTIR/FTIR/TCWret/retrievals_single/Polarstern_retrievals_diff_shape/solidcol/RESULTS/ \
+            /mnt/beegfs/user/phi.richter/DATA_PHD/FTIR/FTIR/PASCAL_SiPCA_FRAM_2017/radiance \
+            /home/phi.richter/SOFTWARE_PHD/Total_Cloud_Water_retrieval/ssp_database/ssp_db.SolidCol.gamma.0p100 \
+            /home/phi.richter/SOFTWARE_PHD/Total_Cloud_Water_retrieval/ssp_database/ssp_db.mie_wat.gamma_sigma_0p100 \
+            /home/phi.richter/RRTMG/RRTMG_LW/build/rrtmg_lw_v5.00_linux_ifort \
+            /home/phi.richter/RRTMG_SW/RRTMG_SW/build/rrtmg_sw_v5.00_linux_pgi_aerosols \
+            solidcol
+            
+sbatch RRTMG /mnt/beegfs/user/phi.richter/DATA_PHD/FTIR/FTIR/TCWret/retrievals_single/Polarstern_retrievals_diff_shape/spheres/RESULTS/ \
+            /mnt/beegfs/user/phi.richter/DATA_PHD/FTIR/FTIR/PASCAL_SiPCA_FRAM_2017/radiance \
+            /home/phi.richter/SOFTWARE_PHD/Total_Cloud_Water_retrieval/ssp_database/ssp_db.mie_ice.gamma_sigma_0p100 \
+            /home/phi.richter/SOFTWARE_PHD/Total_Cloud_Water_retrieval/ssp_database/ssp_db.mie_wat.gamma_sigma_0p100 \
+            /home/phi.richter/RRTMG/RRTMG_LW/build/rrtmg_lw_v5.00_linux_ifort \
+            /home/phi.richter/RRTMG_SW/RRTMG_SW/build/rrtmg_sw_v5.00_linux_pgi_aerosols \
+            spheres
+            
+sbatch RRTMG /mnt/beegfs/user/phi.richter/DATA_PHD/FTIR/FTIR/TCWret/retrievals_single/Polarstern_retrievals_diff_shape/spheroids/RESULTS/ \
+            /mnt/beegfs/user/phi.richter/DATA_PHD/FTIR/FTIR/PASCAL_SiPCA_FRAM_2017/radiance \
+            /home/phi.richter/SOFTWARE_PHD/Total_Cloud_Water_retrieval/ssp_database/ssp_db.Spheroid.gamma.0p100 \
+            /home/phi.richter/SOFTWARE_PHD/Total_Cloud_Water_retrieval/ssp_database/ssp_db.mie_wat.gamma_sigma_0p100 \
+            /home/phi.richter/RRTMG/RRTMG_LW/build/rrtmg_lw_v5.00_linux_ifort \
+            /home/phi.richter/RRTMG_SW/RRTMG_SW/build/rrtmg_sw_v5.00_linux_pgi_aerosols \
+            spheroids

@@ -474,7 +474,44 @@ class RRTMG:
             wn += delta
         
         return np.pi*1e-3*radiance_integral*delta
+    
+    def run(self):
+        cparam = self.get_cparam()
+        position = self.get_position()
         
+        in_cld_rrtm = self.create_inputfile_cloud()
+        input_rrtm = self.create_inputfile_atm_terrestrial(cloud=2, co2_mix=400)
+        self.run_RRTMG_terrestrial()
+        self.remove_rrtmg_files()
+        in_cld_rrtm = self.create_inputfile_cloud()
+        input_rrtm = self.create_inputfile_atm_solar(cloud=2, co2_mix=400)
+        self.run_RRTMG_solar()
+        self.remove_rrtmg_files()
+        flux_all = []
+        flux_integrate = []
+        for win in [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16]:
+            flux_all.append(self.get_fluxes_terrestrial(win)['DOWNWARD FLUX'].iloc[-1])
+            flux_integrate.append(self.integrate_spectral_radiance(model.get_windows_terrestrial()[win-1]))
+            
+        for win in [16,17,18,19,20,21,22,23,24,25,26,27,28,29]:
+            flux_all.append(self.get_fluxes_solar(win)['DOWNWARD FLUX'].iloc[-1])
+            
+        input_rrtm = self.create_inputfile_atm_terrestrial(cloud=0, co2_mix=400)
+        self.run_RRTMG_terrestrial()
+        self.remove_rrtmg_files()
+        in_cld_rrtm = self.create_inputfile_cloud()
+        input_rrtm = self.create_inputfile_atm_solar(cloud=0, co2_mix=400)
+        self.run_RRTMG_solar()
+        self.remove_rrtmg_files()
+
+        flux_clear = []
+        for win in [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16]:
+            flux_clear.append(self.get_fluxes_terrestrial(win)['DOWNWARD FLUX'].iloc[-1])
+            
+        for win in [16,17,18,19,20,21,22,23,24,25,26,27,28,29]:
+            flux_clear.append(self.get_fluxes_solar(win)['DOWNWARD FLUX'].iloc[-1])
+            
+        return cparam, position, flux_all, flux_integrate, flux_clear, self.__date
 if __name__ == '__main__':
     path_retrievals = sys.argv[1]
     path_input = sys.argv[2]
@@ -488,26 +525,37 @@ if __name__ == '__main__':
     os.chdir(outpath)
     files = sorted(os.listdir(path_retrievals))
     
-    model = FLUXES.RRTMG(binary_lw, binary_sw, [ssp_wat, ssp_ice])
-    
+    model = RRTMG(binary_lw, binary_sw, [ssp_wat, ssp_ice])
+    out = {'Date': [], 'Latitude': [], 'Longitude': [], 'SZA': [], 'LWP': [], 'IWP': [], 'rliq': [], 'rice': [], 'red_chi_2': []}
+    for i in range(16):
+        out.update({'FTIR_integrate_{:02d}'.format(i): []})
+    for i in range(29):
+        out.update({'RRTMG_All_{:02d}'.format(i): []})
+        out.update({'RRTMG_Clear_{:02d}'.format(i): []})
     for spec in files:
+        rrtmg_all = []
+        rrtmg_clear = []
+        ftir_all = []
         model.read_tcwret(os.path.join(path_retrievals, spec), path_input)
-        cparam = model.get_cparam()
-        position = model.get_position()
-        
-        in_cld_rrtm = model.create_inputfile_cloud()
-        input_rrtm = model.create_inputfile_atm_terrestrial(cloud=2, co2_mix=400)
-        model.run_RRTMG_terrestrial()
-        model.remove_rrtmg_files()
-        in_cld_rrtm = model.create_inputfile_cloud()
-        input_rrtm = model.create_inputfile_atm_solar(cloud=2, co2_mix=400)
-        model.run_RRTMG_solar()
-        model.remove_rrtmg_files()
-        
-        for win in [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16]:
-            flux_lw = model.get_fluxes_terrestrial(win)['DOWNWARD FLUX'].iloc[-1]
-            flux_integrate = model.integrate_spectral_radiance(model.get_windows_terrestrial()[win-1])
-            
-        for win in [16,17,18,19,20,21,22,23,24,25,26,27,28,29]:
-            flux_solar = model.get_fluxes_solar(win)['DOWNWARD FLUX'].iloc[-1]
-            
+        try:
+            cparam, position, flux_all, flux_integrate, flux_clear, date = model.run()
+            out['Date'].append(date)
+            out['Latitude'].append(position['Latitude'])
+            out['Longitude'].append(position['Longitude'])
+            out['SZA'].append(position['SZA'])
+            out['LWP'].append(np.float(cparam['LWP(gm-2)'].flatten()))
+            out['IWP'].append(np.float(cparam['IWP(gm-2)'].flatten()))
+            out['rliq'].append(np.float(cparam['rliq(um)'].flatten()))
+            out['rice'].append(np.float(cparam['rice(um)'].flatten()))
+            out['red_chi_2'].append(np.float(cparam['red_chi_2'].flatten()))
+            for i in range(29):
+                out['RRTMG_All_{:02d}'.format(i)].append(flux_all[i])
+                out['RRTMG_Clear_{:02d}'.format(i)].append(flux_clear[i])
+
+            for i in range(16):
+                out['FTIR_integrate_{:02d}'.format(i)].append(flux_integrate[i])
+        except UnboundLocalError:
+            continue
+    
+    pd.DataFrame(out).to_csv("out.csv", index=False)
+    
