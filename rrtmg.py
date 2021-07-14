@@ -105,7 +105,10 @@ class RRTMG:
                         [820., 50000.]]
         self.__binary_lw = binary_lw
         self.__binary_sw = binary_sw
-        [self.__liq_db, self.__ice_db] = mie.read_databases(mie_db[0], mie_db[1])
+        try:
+            [self.__liq_db, self.__ice_db] = mie.read_databases(mie_db[0], mie_db[1])
+        except Exception:
+            pass
         
     def read_cloudnet(self, fname):
         pattern = fname.split("/")[-1][:23]
