@@ -127,7 +127,7 @@ class RRTMG:
             self.__rliq  = f.variables['rl'][:]
             self.__rice  = f.variables['ri'][:]
             self.__clevel = f.variables['cloud'][:]
-            self.__height_prof = f.variables['z'][:]
+            self.__height_prof = np.array(f.variables['z'][:])
             self.__temperature_prof = f.variables['t'][:]
             self.__humidity_prof = f.variables['q'][:]
             self.__pressure_prof = f.variables['p'][:]
@@ -224,7 +224,22 @@ class RRTMG:
         if fname != "": plt.savefig(fname)
         plt.show()
 
-    def create_inputfile_atm_solar(self, cloud=0, tprof=[-1], pprof=[-1], hprof=[-1], zprof=[-1], albedo=[0.99], co2_mix=400):
+    def read_trace_gases(self, height, co2, n2o, ch4, o3):
+        co2_f = scipy.interpolate.interp1d(height, co2, fill_value="extrapolate")
+        self.__co2 = co2_f(self.__height_prof)
+        self.__co2[self.__co2 < 0.0] = 0.0
+        n2o_f = scipy.interpolate.interp1d(height, n2o, fill_value="extrapolate")
+        self.__n2o = n2o_f(self.__height_prof)
+        self.__n2o[self.__n2o < 0.0] = 0.0
+        ch4_f = scipy.interpolate.interp1d(height, ch4, fill_value="extrapolate")
+        self.__ch4 = ch4_f(self.__height_prof)
+        self.__ch4[self.__ch4 < 0.0] = 0.0
+        o3_f = scipy.interpolate.interp1d(height, o3, fill_value="extrapolate")
+        self.__o3 = o3_f(self.__height_prof)
+        self.__o3[self.__o3 < 0.0] = 0.0
+        return {'height': self.__height_prof, 'pressure': self.__pressure_prof, 'co2': self.__co2, 'n2o': self.__n2o, 'ch4': self.__ch4, 'o3': self.__o3}
+
+    def create_inputfile_atm_solar(self, cloud=0, tprof=[-1], pprof=[-1], hprof=[-1], zprof=[-1], albedo=[0.99]):
 
         temperature_prof = self.__temperature_prof if tprof[0] == -1 else tprof
         height_prof = self.__height_prof if zprof[0] == -1 else zprof
@@ -282,7 +297,6 @@ class RRTMG:
         IPUNCH = 1
         MUNITS = 1
         RE = 0
-        CO2MX = co2_mix
         REF_LAT = 0
     
         RECORD_3_1  = "{:5d}".format(MODEL)
@@ -292,7 +306,7 @@ class RRTMG:
         RECORD_3_1 += "{:5d}".format(IPUNCH)
         RECORD_3_1 += 3 * " " + "{:2d}".format(MUNITS)
         RECORD_3_1 += "{:10.3f}".format(RE)
-        RECORD_3_1 += 20 * " " + "{:10.3f}".format(CO2MX)
+        RECORD_3_1 += 20 * " " + "{:10.3f}".format(410)
         RECORD_3_1 += "{:10.3f}".format(REF_LAT)
 
         HBOUND = height_prof[0]
@@ -315,11 +329,14 @@ class RRTMG:
         TM = temperature_prof
         JCHARP = "A"
         JCHART = "A"
-        JCHAR = "HA44444"
+        JCHAR = "HACA4A4"
         RECORD_3_5_6 = ""
         VOL = np.array([np.zeros(len(height_prof)) for ii in range(7)])
         VOL[0] = humidity_prof
-        VOL[1] = co2_mix * np.ones(humidity_prof.size)
+        VOL[1] = self.__co2
+        VOL[2] = self.__o3
+        VOL[3] = self.__n2o
+        VOL[5] = self.__ch4
         for loop in range(len(height_prof)):
             RECORD_3_5_6 += "{:10.3E}".format(ZM[loop])
             RECORD_3_5_6 += "{:10.3E}".format(PM[loop])
@@ -339,7 +356,7 @@ class RRTMG:
             f.write(ret)
         return ret
         
-    def create_inputfile_atm_terrestrial(self, cloud=0, tprof=[-1], pprof=[-1], hprof=[-1], zprof=[-1], semiss=[0.99], co2_mix=400):
+    def create_inputfile_atm_terrestrial(self, cloud=0, tprof=[-1], pprof=[-1], hprof=[-1], zprof=[-1], semiss=[0.99], atm="4444444"):
         '''
         Create ASCII input for RRTMG containing informations about the atmosphere (terrestrial).
         For more informations refer to RRTMG
@@ -415,11 +432,14 @@ class RRTMG:
         TM = temperature_prof
         JCHARP = "A"
         JCHART = "A"
-        JCHAR = "HA44444"
+        JCHAR = atm
         RECORD_3_5_6 = ""
         VOL = np.array([np.zeros(len(height_prof)) for ii in range(7)])
         VOL[0] = humidity_prof
-        VOL[1] = co2_mix * np.ones(humidity_prof.size)
+        VOL[1] = self.__co2
+        VOL[2] = self.__o3
+        VOL[3] = self.__n2o
+        VOL[5] = self.__ch4
         for loop in range(len(height_prof)):
             RECORD_3_5_6 += "{:10.3E}".format(ZM[loop])
             RECORD_3_5_6 += "{:10.3E}".format(PM[loop])
