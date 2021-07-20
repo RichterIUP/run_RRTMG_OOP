@@ -239,7 +239,7 @@ class RRTMG:
         self.__o3[self.__o3 < 0.0] = 0.0
         return {'height': self.__height_prof, 'pressure': self.__pressure_prof, 'co2': self.__co2, 'n2o': self.__n2o, 'ch4': self.__ch4, 'o3': self.__o3}
 
-    def create_inputfile_atm_solar(self, cloud=0, tprof=[-1], pprof=[-1], hprof=[-1], zprof=[-1], albedo=[0.99]):
+    def create_inputfile_atm_solar(self, cloud=0, tprof=[-1], pprof=[-1], hprof=[-1], zprof=[-1], albedo=[0.99], atm="4444444"):
 
         temperature_prof = self.__temperature_prof if tprof[0] == -1 else tprof
         height_prof = self.__height_prof if zprof[0] == -1 else zprof
@@ -329,7 +329,7 @@ class RRTMG:
         TM = temperature_prof
         JCHARP = "A"
         JCHART = "A"
-        JCHAR = "HACA4A4"
+        JCHAR = atm
         RECORD_3_5_6 = ""
         VOL = np.array([np.zeros(len(height_prof)) for ii in range(7)])
         VOL[0] = humidity_prof
@@ -374,7 +374,7 @@ class RRTMG:
         IOUT = 99
         IDRV = 0
         IMCA = 1 if cloud != 0 else 0
-        IMCA = 1
+        #IMCA = 1
         ICLD = cloud
         RECORD_1_2  = 18 * " " + "{:2d}".format(IAER)
         RECORD_1_2 += 29 * " " + "{:1d}".format(IATM)
