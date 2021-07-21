@@ -14,5 +14,4 @@ module load Python
 module load netcdf4-python
 module load matplotlib
 
-#python3 rrtmg.py $1 $2 $3 $4 $5 $6 $7
-python3 run_RRTMG.py RRTMG_input_nomod
+python3 run_RRTMG_Cloudnet.py
