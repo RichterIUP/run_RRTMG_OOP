@@ -298,7 +298,7 @@ class RRTMG:
                 'ch4': self.__cloud['ch4'], \
                 'o3': self.__cloud['o3']}
 
-    def create_inputfile_atm_solar(self, cloud=0, tprof=[-1], pprof=[-1], hprof=[-1], zprof=[-1], albedo=[0.99], atm="4444444"):
+    def create_inputfile_atm_solar(self, aerosols=0, cloud=0, tprof=[-1], pprof=[-1], hprof=[-1], zprof=[-1], albedo=[0.99], atm="4444444"):
 
         temperature_prof = self.__cloud['temperature_prof'] if tprof[0] == -1 else tprof
         height_prof = self.__cloud['height_prof'] if zprof[0] == -1 else zprof
@@ -307,7 +307,7 @@ class RRTMG:
         
         RECORD_1_1 = "{:80s}".format("$ RRTM_SW runscript created on {}".format(dt.datetime.now()))
 
-        IAER = 0
+        IAER = aerosols
         IATM = 1
         ISCAT = 1
         IOUT = 98
@@ -412,6 +412,38 @@ class RRTMG:
             RECORD_3_1 + "\n" + RECORD_3_2 + "\n" + RECORD_3_3B + "\n" + RECORD_3_4 + "\n" + \
             RECORD_3_5_6
         with open("INPUT_RRTM", "w") as f:
+            f.write(ret)
+        return ret
+    
+    def create_inputfile_aerosols_solar(self, level=[0], aot=[0.19], num_aer=1, iaod=0, issa=0, ipha=0, aerpar=[0.13, 1.0, 0.0], ssa=[0.780], phase=[0.7]):
+        
+        RECORD_A1_1 = 3*" "+ "{:2d}".format(num_aer)
+        RECORD_A2_1 = 3*" "+ "{:2d}".format(len(level))
+        RECORD_A2_1+= 4*" "+ "{:1d}".format(iaod)
+        RECORD_A2_1+= 4*" "+ "{:1d}".format(issa)
+        RECORD_A2_1+= 4*" "+ "{:1d}".format(ipha)
+        RECORD_A2_1+= "{:8.2f}".format(aerpar[0]) + "{:8.2f}".format(aerpar[1]) + "{:8.2f}".format(aerpar[2]) 
+        RECORD_A2_1_1 = ""
+
+        for i in enumerate(level):
+            RECORD_A2_1_1 += 2*" " + "{:3d}".format(i[1]) + "{:7.4f}".format(aot[i[0]]) + "\n"
+           
+        RECORD_A2_2 = ""
+        if iaod == 0:
+            RECORD_A2_2 = "{:5.2f}".format(ssa[0])
+        else:
+            for i in range(14):
+                RECORD_A2_2 += "{:5.2f}".format(ssa[i])
+                
+        RECORD_A2_3 = ""
+        if ipha == 0:
+            RECORD_A2_3 = "{:5.2f}".format(phase[0])
+        else:
+            for i in range(14):
+                RECORD_A2_3 += "{:5.2f}".format(phase[i])
+                
+        ret = RECORD_A1_1 + "\n" + RECORD_A2_1 + "\n" + RECORD_A2_1_1 + RECORD_A2_2 + "\n" + RECORD_A2_3 + "\n"
+        with open("IN_AER_RRTM", "w") as f:
             f.write(ret)
         return ret
         
