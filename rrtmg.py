@@ -71,6 +71,42 @@ def read_results(layer, wavenumbers, fname="OUTPUT_RRTM"):
 
 class RRTMG:
     def __init__(self, binary_lw, binary_sw, mie_db):
+        self.__cloud = {'date': None, \
+                        'wavenumber': None, \
+                        'spectrum': None, \
+                        'latitude': None, \
+                        'longitude': None, \
+                        'height_prof': None, \
+                        'pressure_prof': None, \
+                        'humidity_prof': None, \
+                        'temperature_prof': None, \
+                        'sza': None, \
+                        'red_chi_2': None, \
+                        'tau_liq': None, \
+                        'tau_ice': None, \
+                        'rliq': None, \
+                        'rice': None, \
+                        'clevel': None, \
+                        'lwp': None, \
+                        'iwp': None, \
+                        'wpi': None, \
+                        'cwp': None, \
+                        'clt': None, \
+                        'iceconc': None, \
+                        'albedo': None, \
+                        'co2': None, \
+                        'n2o': None, \
+                        'ch4': None, \
+                        'o3': None, \
+                        'diff_lwp': None, \
+                        'flag_lwc': None, \
+                        'flag_iwc': None, \
+                        'flag_reff': None, \
+                        'flag_reffice': None, \
+                        'fluxes_sw_all': None, \
+                        'fluxes_sw_clear': None, \
+                        'fluxes_lw_all': None, \
+                        'fluxes_lw_clear': None}
         self.__wn_lw = [[10., 350.], \
                         [350., 500.], \
                         [500., 630.], \
@@ -110,96 +146,114 @@ class RRTMG:
         except Exception:
             pass
         
-    def read_cloudnet(self, fname):
+    def read_cloudnet(self, fname, pattern_fname="in_CNET_%Y%m%d_%H%M%S"):
         pattern = fname.split("/")[-1][:23]
-        self.__date = dt.datetime.strptime(pattern, "in_CNET_%Y%m%d_%H%M%S")
-        self.__wavenumber = np.array([])
-        self.__spectrum = np.array([])
+        self.__cloud['date'] = dt.datetime.strptime(pattern, pattern_fname)
         
         with nc.Dataset(fname, "r") as f:
-            self.__latitude = f.variables['lat'][0]
-            self.__longitude = f.variables['lon'][0]
-            self.__sza = f.variables['sza'][0]
-            cwp = f.variables['cwp'][:]
-            self.__wpi = f.variables['wpi'][:]
-            self.__lwp = cwp * (1-self.__wpi)
-            self.__iwp = cwp * self.__wpi
-            self.__rliq  = f.variables['rl'][:]
-            self.__rice  = f.variables['ri'][:]
-            self.__clevel = f.variables['cloud'][:]
-            self.__height_prof = np.array(f.variables['z'][:])
-            self.__temperature_prof = f.variables['t'][:]
-            self.__humidity_prof = f.variables['q'][:]
-            self.__pressure_prof = f.variables['p'][:]
-            self.__albedo = np.float(f.variables['albedo_dir'][0])
-            self.__clt = np.ones(self.__lwp.size)
-            self.__iceconc = np.float(f.variables['iceconc'][0])
-            self.__red_chi_2 = -1.0
-            self.__co2 = np.abs(f.variables['co2'][:])
-            self.__n2o = np.abs(f.variables['n2o'][:])
-            self.__ch4 = np.abs(f.variables['ch4'][:])
-            self.__diff_lwp = f.variables['diff_lwp'][0]
-            self.__flag_lwc = f.variables['flag_lwc'][0]
-            self.__flag_iwc = f.variables['flag_iwc'][0]
-            self.__flag_reff = f.variables['flag_reff'][0]
-            self.__flag_reffice = f.variables['flag_reffice'][0]
-        self.__fluxes_sw_all = [None for i in range(15)]
-        self.__fluxes_sw_clear = [None for i in range(15)]
-        self.__fluxes_lw_all = [None for i in range(17)]
-        self.__fluxes_lw_clear = [None for i in range(17)]
-        return
+            self.__cloud['latitude'] = f.variables['lat'][0]
+            self.__cloud['longitude'] = f.variables['lon'][0]
+            self.__cloud['sza'] = f.variables['sza'][0]
+            self.__cloud['cwp'] = f.variables['cwp'][:]
+            self.__cloud['wpi'] = f.variables['wpi'][:]
+            self.__cloud['lwp'] = self.__cloud['cwp'] * (1-self.__cloud['wpi'])
+            self.__cloud['iwp'] = self.__cloud['cwp'] * self.__cloud['wpi']
+            self.__cloud['rliq'] = f.variables['rl'][:]
+            self.__cloud['rice'] = f.variables['ri'][:]
+            self.__cloud['clevel'] = f.variables['cloud'][:]
+            self.__cloud['height_prof'] = np.array(f.variables['z'][:])
+            self.__cloud['temperature_prof'] = f.variables['t'][:]
+            self.__cloud['humidity_prof'] = f.variables['q'][:]
+            self.__cloud['pressure_prof'] = f.variables['p'][:]
+            self.__cloud['albedo'] = np.float(f.variables['albedo_dir'][0])
+            self.__cloud['clt'] = np.ones(self.__cloud['lwp'].size)
+            self.__cloud['iceconc'] = np.float(f.variables['iceconc'][0])
+            self.__cloud['co2'] = np.abs(f.variables['co2'][:])
+            self.__cloud['n2o'] = np.abs(f.variables['n2o'][:])
+            self.__cloud['ch4'] = np.abs(f.variables['ch4'][:])
+            self.__cloud['diff_lwp'] = f.variables['diff_lwp'][0]
+            self.__cloud['flag_lwc'] = f.variables['flag_lwc'][0]
+            self.__cloud['flag_iwc'] = f.variables['flag_iwc'][0]
+            self.__cloud['flag_reff'] = f.variables['flag_reff'][0]
+            self.__cloud['flag_reffice'] = f.variables['flag_reffice'][0]
+        self.__cloud['fluxes_sw_all'] = [None for i in range(15)]
+        self.__cloud['fluxes_sw_clear'] = [None for i in range(15)]
+        self.__cloud['fluxes_lw_all'] = [None for i in range(17)]
+        self.__cloud['fluxes_lw_clear'] = [None for i in range(17)]
 
     def read_tcwret(self, fname, input_radiance=""):
         pattern = fname.split("/")[-1]
-        self.__date = dt.datetime.strptime(pattern, "results_%Y%m%d%H%M%S.nc")
-        time_dec = self.__date.hour + self.__date.minute/60.0 + self.__date.second/3600.0
+        self.__cloud['date'] = dt.datetime.strptime(pattern, "results_%Y%m%d%H%M%S.nc")
+        time_dec = self.__cloud['date'].hour + self.__cloud['date'].minute/60.0 + self.__cloud['date'].second/3600.0
 
         ## Read radiances from inputfiles of TCWret. This is done because the radiance output from TCWret is averaged
         ## for the microwindows. One can use the radiance output from TCWret if no path to the inputfiles is specified
         if input_radiance != "":
-            with nc.Dataset(os.path.join(input_radiance, "PS.{:04d}{:02d}{:02d}.nc".format(self.__date.year, self.__date.month, self.__date.day))) as f:
+            with nc.Dataset(os.path.join(input_radiance, "PS.{:04d}{:02d}{:02d}.nc".format(self.__cloud['date'].year, self.__cloud['date'].month, self.__cloud['date'].day))) as f:
                 idx = np.argmin(np.abs(f.variables['time_dec'][:]-time_dec))
-                self.__wavenumber = f.variables['wavenumber'][idx]
-                self.__spectrum = f.variables['radiance'][idx]
+                self.__cloud['wavenumber'] = f.variables['wavenumber'][idx]
+                self.__cloud['spectrum'] = f.variables['radiance'][idx]
         
         with nc.Dataset(fname, "r") as f:
-            self.__latitude = np.float(f.variables['lat'][0])
-            self.__longitude = np.float(f.variables['lon'][0])
-            self.__height_prof = f.variables['z'][:]*1e-3
-            self.__pressure_prof = f.variables['P'][:]
-            self.__humidity_prof = f.variables['humidity'][:]
-            self.__temperature_prof = f.variables['T'][:]
-            self.__sza = np.float(f.variables['sza'][0])
+            self.__cloud['latitude'] = np.float(f.variables['lat'][0])
+            self.__cloud['longitude'] = np.float(f.variables['lon'][0])
+            self.__cloud['height_prof'] = f.variables['z'][:]*1e-3
+            self.__cloud['pressure_prof'] = f.variables['P'][:]
+            self.__cloud['humidity_prof'] = f.variables['humidity'][:]
+            self.__cloud['temperature_prof'] = f.variables['T'][:]
+            self.__cloud['sza'] = np.float(f.variables['sza'][0])
             if input_radiance == "":
-                self.__wavenumber = f.variables['wavenumber'][:]
-                self.__spectrum = f.variables['lbldis radiance'][:]
+                self.__cloud['wavenumber'] = f.variables['wavenumber'][:]
+                self.__cloud['spectrum'] = f.variables['lbldis radiance'][:]
         
-            self.__red_chi_2 = f.variables['red_chi_2'][0]
-            self.__xret = f.variables['x_ret'][:]
-            self.__clevel = np.array(np.where(self.__height_prof == f.variables['clevel'][:]*1e-3)[0])
-            self.__rliq = np.array([np.exp(f.variables['x_ret'][2])])
-            self.__rice = np.array([np.exp(f.variables['x_ret'][3])])
-            self.__lwp = np.array([mie.calc_lwp(self.__rliq, 0.0, self.__xret[0], 0.0)[0]])
-            self.__iwp = np.array([mie.calc_iwp(self.__xret[1], 0.0, self.__rice, 0.0, self.__ice_db)[0]])
-            self.__wpi = self.__iwp/(self.__lwp+self.__iwp)
-            self.__clt = np.ones(self.__clevel.size)
-            self.__albedo = 0.99
-            self.__co2 = np.ones(self.__height_prof.size)
-            self.__n2o = -1*np.ones(self.__height_prof.size)
-            self.__ch4 = -1*np.ones(self.__height_prof.size)
-            self.__diff_lwp = 0.0#f.variables['diff_lwp'][0]
-            self.__flag_lwc = 0#f.variables['flag_lwc'][0]
-            self.__flag_iwc = 0#f.variables['flag_iwc'][0]
-            self.__flag_reff = 0#f.variables['flag_reff'][0]
-            self.__flag_reffice = 0#f.variables['flag_reffice'][0]
-        self.__fluxes_sw_all = [None for i in range(15)]
-        self.__fluxes_sw_clear = [None for i in range(15)]
-        self.__fluxes_lw_all = [None for i in range(17)]
-        self.__fluxes_lw_clear = [None for i in range(17)]
+            self.__cloud['red_chi_2'] = f.variables['red_chi_2'][0]
+            xret = f.variables['x_ret'][:]
+            self.__cloud['clevel'] = np.array(np.where(self.__cloud['height_prof'] == f.variables['clevel'][:]*1e-3)[0])
+            self.__cloud['tau_liq'] = f.variables['x_ret'][0]
+            self.__cloud['tau_ice'] = f.variables['x_ret'][1]
+            self.__cloud['rliq'] = np.array([np.exp(f.variables['x_ret'][2])])
+            self.__cloud['rice'] = np.array([np.exp(f.variables['x_ret'][3])])
+            self.__cloud['lwp'] = np.array([mie.calc_lwp(self.__cloud['rliq'], 0.0, self.__cloud['tau_liq'], 0.0)[0]])
+            self.__cloud['iwp'] = np.array([mie.calc_iwp(self.__cloud['tau_ice'], 0.0, self.__cloud['rice'], 0.0, self.__ice_db)[0]])
+            self.__cloud['cwp'] = self.__cloud['lwp'] + self.__cloud['iwp']
+            self.__cloud['wpi'] = self.__cloud['iwp']/self.__cloud['cwp']
+            self.__cloud['clt'] = np.ones(self.__cloud['clevel'].size)
+            self.__cloud['albedo'] = 0.99
+            self.__cloud['co2'] = np.ones(self.__cloud['height_prof'].size)
+            self.__cloud['n2o'] = -1*np.ones(self.__cloud['height_prof'].size)
+            self.__cloud['ch4'] = -1*np.ones(self.__cloud['height_prof'].size)
+            self.__cloud['diff_lwp'] = 0.0
+            self.__cloud['flag_lwc'] = 0
+            self.__cloud['flag_iwc'] = 0
+            self.__cloud['flag_reff'] = 0
+            self.__cloud['flag_reffice'] = 0
+        self.__cloud['fluxes_sw_all'] = [None for i in range(15)]
+        self.__cloud['fluxes_sw_clear'] = [None for i in range(15)]
+        self.__cloud['fluxes_lw_all'] = [None for i in range(17)]
+        self.__cloud['fluxes_lw_clear'] = [None for i in range(17)]
+        
+    def scale(self, key, factor):
+        self.__cloud[key] = self.__cloud[key]*factor
+        
+    def offset(self, key, offs):
+        self.__cloud[key] = self.__cloud[key]+offs
+        
+    def replace_atmosphere(self, fname, key_height="height(m)", key_pressure="pressure(hPa)", key_humidity="humidity(%)", key_temperature="temperature(K)"):
+        if os.path.exists(fname):
+            atm_new = pd.read_csv(fname)
+            temp_f = scipy.interpolate.interp1d(atm_new[key_height]*1e-3, atm_new[key_temperature], fill_value="extrapolate")
+            humd_f = scipy.interpolate.interp1d(atm_new[key_height]*1e-3, atm_new[key_humidity], fill_value="extrapolate")
+            plev_f = scipy.interpolate.interp1d(atm_new[key_height]*1e-3, atm_new[key_pressure], fill_value="extrapolate")
+            self.__cloud['temperature_prof'] = temp_f(self.__cloud['height_prof'])
+            self.__cloud['humidity_prof'] = humd_f(self.__cloud['height_prof'])
+            self.__cloud['pressure_prof'] = plev_f(self.__cloud['height_prof'])
+            self.__cloud['temperature_prof'][self.__cloud['temperature_prof'] < 0.0] = 0.0
+            self.__cloud['humidity_prof'][self.__cloud['humidity_prof'] < 0.0] = 0.0
+            self.__cloud['pressure_prof'][self.__cloud['pressure_prof'] < 0.0] = 0.0
 
     def plot_spectrum(self, ylim=[-1, -1], xlim=[-1, -1], fname=""):
         fig, ax = plt.subplots(1, 1, figsize=(10, 5))
-        ax.plot(self.__wavenumber, self.__spectrum)
+        ax.plot(self.__cloud['wavenumber'], self.__cloud['spectrum'])
         ax.grid(True)
         if ylim != [-1, -1]: ax.set_ylim(ylim)
         if xlim != [-1, -1]: ax.set_xlim(xlim)
@@ -210,12 +264,12 @@ class RRTMG:
         fig, ax = plt.subplots(1, 2, figsize=(10, 5))
         ax[0].set_title("Height coordinates")
         ax[1].set_title("Pressure coordinates")
-        ax[0].plot(self.__humidity_prof, self.__height_prof, label="Humidity")
-        ax[0].plot(self.__temperature_prof, self.__height_prof, label="Temperature")
-        ax[0].hlines(self.__height_prof[self.__clevel], 0, 300, label="Cloud")
-        ax[1].plot(self.__humidity_prof, self.__pressure_prof, label="Humidity")
-        ax[1].plot(self.__temperature_prof, self.__pressure_prof, label="Temperature")
-        ax[1].hlines(self.__pressure_prof[self.__clevel], 0, 300, label="Cloud")
+        ax[0].plot(self.__cloud['humidity_prof'], self.__cloud['height_prof'], label="Humidity")
+        ax[0].plot(self.__cloud['temperature_prof'], self.__cloud['height_prof'], label="Temperature")
+        ax[0].hlines(self.__cloud['height_prof'][self.__cloud['clevel']], 0, 300, label="Cloud")
+        ax[1].plot(self.__cloud['humidity_prof'], self.__cloud['pressure_prof'], label="Humidity")
+        ax[1].plot(self.__cloud['temperature_prof'], self.__cloud['pressure_prof'], label="Temperature")
+        ax[1].hlines(self.__cloud['pressure_prof'][self.__cloud['clevel']], 0, 300, label="Cloud")
 
         ax[1].set_ylim([1013, 0])
         for i in range(2):
@@ -226,25 +280,30 @@ class RRTMG:
 
     def read_trace_gases(self, height, co2, n2o, ch4, o3):
         co2_f = scipy.interpolate.interp1d(height, co2, fill_value="extrapolate")
-        self.__co2 = co2_f(self.__height_prof)
-        self.__co2[self.__co2 < 0.0] = 0.0
+        self.__cloud['co2'] = co2_f(self.__cloud['height_prof'])
+        self.__cloud['co2'][self.__cloud['co2'] < 0.0] = 0.0
         n2o_f = scipy.interpolate.interp1d(height, n2o, fill_value="extrapolate")
-        self.__n2o = n2o_f(self.__height_prof)
-        self.__n2o[self.__n2o < 0.0] = 0.0
+        self.__cloud['n2o'] = n2o_f(self.__cloud['height_prof'])
+        self.__cloud['n2o'][self.__cloud['n2o'] < 0.0] = 0.0
         ch4_f = scipy.interpolate.interp1d(height, ch4, fill_value="extrapolate")
-        self.__ch4 = ch4_f(self.__height_prof)
-        self.__ch4[self.__ch4 < 0.0] = 0.0
+        self.__cloud['ch4'] = ch4_f(self.__cloud['height_prof'])
+        self.__cloud['ch4'][self.__cloud['ch4'] < 0.0] = 0.0
         o3_f = scipy.interpolate.interp1d(height, o3, fill_value="extrapolate")
-        self.__o3 = o3_f(self.__height_prof)
-        self.__o3[self.__o3 < 0.0] = 0.0
-        return {'height': self.__height_prof, 'pressure': self.__pressure_prof, 'co2': self.__co2, 'n2o': self.__n2o, 'ch4': self.__ch4, 'o3': self.__o3}
+        self.__cloud['o3'] = o3_f(self.__cloud['height_prof'])
+        self.__cloud['o3'][self.__cloud['o3'] < 0.0] = 0.0
+        return {'height': self.__cloud['height_prof'], \
+                'pressure': self.__cloud['pressure_prof'], \
+                'co2': self.__cloud['co2'], \
+                'n2o': self.__cloud['n2o'], \
+                'ch4': self.__cloud['ch4'], \
+                'o3': self.__cloud['o3']}
 
     def create_inputfile_atm_solar(self, cloud=0, tprof=[-1], pprof=[-1], hprof=[-1], zprof=[-1], albedo=[0.99], atm="4444444"):
 
-        temperature_prof = self.__temperature_prof if tprof[0] == -1 else tprof
-        height_prof = self.__height_prof if zprof[0] == -1 else zprof
-        humidity_prof = self.__humidity_prof if hprof[0] == -1 else hprof
-        pressure_prof = self.__pressure_prof if pprof[0] == -1 else pprof
+        temperature_prof = self.__cloud['temperature_prof'] if tprof[0] == -1 else tprof
+        height_prof = self.__cloud['height_prof'] if zprof[0] == -1 else zprof
+        humidity_prof = self.__cloud['humidity_prof'] if hprof[0] == -1 else hprof
+        pressure_prof = self.__cloud['pressure_prof'] if pprof[0] == -1 else pprof
         
         RECORD_1_1 = "{:80s}".format("$ RRTM_SW runscript created on {}".format(dt.datetime.now()))
 
@@ -271,8 +330,8 @@ class RRTMG:
         RECORD_1_2 += 3  * " " + "{:1d}".format(IDELM)
         RECORD_1_2 += "{:1d}".format(ICOS)
 
-        JULDAT = int((self.__date - dt.datetime(self.__date.year, 1, 1)).total_seconds()/(24*3600.0))
-        SZA = self.__sza
+        JULDAT = int((self.__cloud['date'] - dt.datetime(self.__cloud['date'].year, 1, 1)).total_seconds()/(24*3600.0))
+        SZA = self.__cloud['sza']
         ISOLVAR = 0
         SCON = 1370
         SOLCYCFRAC = 0
@@ -283,7 +342,7 @@ class RRTMG:
         RECORD_1_2_1 += "{:10.5f}".format(SOLCYCFRAC)
         IEMIS = 1 if len(albedo) == 1 else 2
         IREFLECT = 0
-        SEMISS = albedo
+        SEMISS = [self.__cloud['albedo']]
     
         RECORD_1_4  = 11 * " " + "{:1d}".format(IEMIS)
         RECORD_1_4 += 2  * " " + "{:1d}".format(IREFLECT)
@@ -333,10 +392,10 @@ class RRTMG:
         RECORD_3_5_6 = ""
         VOL = np.array([np.zeros(len(height_prof)) for ii in range(7)])
         VOL[0] = humidity_prof
-        VOL[1] = self.__co2
-        VOL[2] = self.__o3
-        VOL[3] = self.__n2o
-        VOL[5] = self.__ch4
+        VOL[1] = self.__cloud['co2']
+        VOL[2] = self.__cloud['o3']
+        VOL[3] = self.__cloud['n2o']
+        VOL[5] = self.__cloud['ch4']
         for loop in range(len(height_prof)):
             RECORD_3_5_6 += "{:10.3E}".format(ZM[loop])
             RECORD_3_5_6 += "{:10.3E}".format(PM[loop])
@@ -362,10 +421,10 @@ class RRTMG:
         For more informations refer to RRTMG
         '''
 
-        temperature_prof = self.__temperature_prof if tprof[0] == -1 else tprof
-        height_prof = self.__height_prof if zprof[0] == -1 else zprof
-        humidity_prof = self.__humidity_prof if hprof[0] == -1 else hprof
-        pressure_prof = self.__pressure_prof if pprof[0] == -1 else pprof
+        temperature_prof = self.__cloud['temperature_prof'] if tprof[0] == -1 else tprof
+        height_prof = self.__cloud['height_prof'] if zprof[0] == -1 else zprof
+        humidity_prof = self.__cloud['humidity_prof'] if hprof[0] == -1 else hprof
+        pressure_prof = self.__cloud['pressure_prof'] if pprof[0] == -1 else pprof
         RECORD_1_1 = "{:80s}".format("$ RRTM_LW runscript created on {}".format(dt.datetime.now()))
         IAER = 0
         IATM = 1
@@ -436,10 +495,10 @@ class RRTMG:
         RECORD_3_5_6 = ""
         VOL = np.array([np.zeros(len(height_prof)) for ii in range(7)])
         VOL[0] = humidity_prof
-        VOL[1] = self.__co2
-        VOL[2] = self.__o3
-        VOL[3] = self.__n2o
-        VOL[5] = self.__ch4
+        VOL[1] = self.__cloud['co2']
+        VOL[2] = self.__cloud['o3']
+        VOL[3] = self.__cloud['n2o']
+        VOL[5] = self.__cloud['ch4']
         for loop in range(len(height_prof)):
             RECORD_3_5_6 += "{:10.3E}".format(ZM[loop])
             RECORD_3_5_6 += "{:10.3E}".format(PM[loop])
@@ -471,12 +530,12 @@ class RRTMG:
         RECORD_C1_1  = 4 * " " + "{:1d}".format(INFLAG)
         RECORD_C1_1 += 4 * " " + "{:1d}".format(ICEFLAG)
         RECORD_C1_1 += 4 * " " + "{:1d}".format(LIQFLAG)
-        CLDFRAC = self.__clt if clt[0] == -1 else clt
-        FRACICE = self.__wpi if wpi[0] == -1 else  wpi
-        EFFSIZEICE = self.__rice if rice[0] == -1 else rice
-        EFFSIZELIQ = self.__rliq if rliq[0] == -1 else rliq
-        CWP = self.__lwp+self.__iwp if cwp[0] == -1 else cwp
-        LAY = self.__clevel if lay[0] == -1 else lay
+        CLDFRAC = self.__cloud['clt'] if clt[0] == -1 else clt
+        FRACICE = self.__cloud['wpi'] if wpi[0] == -1 else  wpi
+        EFFSIZEICE = self.__cloud['rice'] if rice[0] == -1 else rice
+        EFFSIZELIQ = self.__cloud['rliq'] if rliq[0] == -1 else rliq
+        CWP = self.__cloud['cwp'] if cwp[0] == -1 else cwp
+        LAY = self.__cloud['clevel'] if lay[0] == -1 else lay
         RECORD_C1_3 = ""
         ii = 0
             
@@ -507,42 +566,42 @@ class RRTMG:
         subprocess.call(['{}'.format(self.__binary_lw)])
         for i in enumerate(self.__wn_lw):
             if clouds:
-                self.__fluxes_lw_all[i[0]] = read_results(len(self.__height_prof), wavenumbers=[i[1][0], i[1][1]])
+                self.__cloud['fluxes_lw_all'][i[0]] = read_results(len(self.__cloud['height_prof']), wavenumbers=[i[1][0], i[1][1]])
             else:
-                self.__fluxes_lw_clear[i[0]] = read_results(len(self.__height_prof), wavenumbers=[i[1][0], i[1][1]])                     
+                self.__cloud['fluxes_lw_clear'][i[0]] = read_results(len(self.__cloud['height_prof']), wavenumbers=[i[1][0], i[1][1]])                     
 
     def run_RRTMG_solar(self, clouds=True):
         subprocess.call(['{}'.format(self.__binary_sw)])
         for i in enumerate(self.__wn_sw):
             if clouds:
-                self.__fluxes_sw_all[i[0]] = read_results(len(self.__height_prof), wavenumbers=[i[1][0], i[1][1]])
+                self.__cloud['fluxes_sw_all'][i[0]] = read_results(len(self.__cloud['height_prof']), wavenumbers=[i[1][0], i[1][1]])
             else:
-                self.__fluxes_sw_clear[i[0]] = read_results(len(self.__height_prof), wavenumbers=[i[1][0], i[1][1]])           
+                self.__cloud['fluxes_sw_clear'][i[0]] = read_results(len(self.__cloud['height_prof']), wavenumbers=[i[1][0], i[1][1]])           
         
     def get_fluxes_terrestrial(self, window):
-        return {'all': self.__fluxes_lw_all[window-1], 'clear': self.__fluxes_lw_clear[window-1]}
+        return {'all': self.__cloud['fluxes_lw_all'][window-1], 'clear': self.__cloud['fluxes_lw_clear'][window-1]}
 
     def get_fluxes_solar(self, window):
-        return {'all': self.__fluxes_sw_all[window-16], 'clear': self.__fluxes_sw_clear[window-16]}
+        return {'all': self.__cloud['fluxes_sw_all'][window-16], 'clear': self.__cloud['fluxes_sw_clear'][window-16]}
 
     def get_cparam(self):
-        return {'LWP(gm-2)': np.array(self.__lwp), \
-                'IWP(gm-2)': np.array(self.__iwp), \
-                'rliq(um)': np.array(self.__rliq), \
-                'rice(um)': np.array(self.__rice), \
-                'clt': self.__clt, \
-                'red_chi_2': np.array(self.__red_chi_2)}
+        return {'LWP(gm-2)': np.array(self.__cloud['lwp']), \
+                'IWP(gm-2)': np.array(self.__cloud['iwp']), \
+                'rliq(um)': np.array(self.__cloud['rliq']), \
+                'rice(um)': np.array(self.__cloud['rice']), \
+                'clt': self.__cloud['clt'], \
+                'red_chi_2': np.array(self.__cloud['red_chi_2'])}
             
     def get_atmosphere(self):
-        return {'height': np.array(self.__height_prof), \
-                'pressure': np.array(self.__pressure_prof), \
-                'temperature': np.array(self.__temperature_prof), \
-                'humidity': np.array(self.__humidity_prof)}
+        return {'height': np.array(self.__cloud['height_prof']), \
+                'pressure': np.array(self.__cloud['pressure_prof']), \
+                'temperature': np.array(self.__cloud['temperature_prof']), \
+                'humidity': np.array(self.__cloud['humidity_prof'])}
 
     def get_position(self):
-        return {'Latitude': self.__latitude, \
-                'Longitude': self.__longitude, \
-                'SZA': self.__sza}
+        return {'Latitude': self.__cloud['latitude'], \
+                'Longitude': self.__cloud['longitude'], \
+                'SZA': self.__cloud['sza']}
     
     def remove_rrtmg_files(self):
         files = ['tape6', 'TAPE6', 'TAPE7' 'INPUT_RRTM', 'IN_CLD_RRTM', 'OUTPUT_RRTM']
@@ -561,45 +620,6 @@ class RRTMG:
         
         return np.pi*1e-3*radiance_integral*delta
 
-    def run(self):
-        
-            cparam = self.get_cparam()
-            position = self.get_position()
-            
-            in_cld_rrtm = self.create_inputfile_cloud()
-            input_rrtm = self.create_inputfile_atm_terrestrial(cloud=2, co2_mix=400)
-            self.run_RRTMG_terrestrial()
-            self.remove_rrtmg_files()
-            in_cld_rrtm = self.create_inputfile_cloud()
-            input_rrtm = self.create_inputfile_atm_solar(cloud=2, co2_mix=400)
-            self.run_RRTMG_solar()
-            self.remove_rrtmg_files()
-            flux_all = []
-            flux_integrate = []
-            for win in [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16]:
-                flux_all.append(self.get_fluxes_terrestrial(win)['DOWNWARD FLUX'].iloc[-1])
-                flux_integrate.append(self.integrate_spectral_radiance(model.get_windows_terrestrial()[win-1]))
-                
-            for win in [16,17,18,19,20,21,22,23,24,25,26,27,28,29]:
-                flux_all.append(self.get_fluxes_solar(win)['DOWNWARD FLUX'].iloc[-1])
-                
-            input_rrtm = self.create_inputfile_atm_terrestrial(cloud=0, co2_mix=400)
-            self.run_RRTMG_terrestrial()
-            self.remove_rrtmg_files()
-            in_cld_rrtm = self.create_inputfile_cloud()
-            input_rrtm = self.create_inputfile_atm_solar(cloud=0, co2_mix=400)
-            self.run_RRTMG_solar()
-            self.remove_rrtmg_files()
-    
-            flux_clear = []
-            for win in [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16]:
-                flux_clear.append(self.get_fluxes_terrestrial(win)['DOWNWARD FLUX'].iloc[-1])
-                
-            for win in [16,17,18,19,20,21,22,23,24,25,26,27,28,29]:
-                flux_clear.append(self.get_fluxes_solar(win)['DOWNWARD FLUX'].iloc[-1])
-                
-            return cparam, position, flux_all, flux_integrate, flux_clear, self.__date
-
     def write_results(self, fname):
         '''
         Write results of RRTMG calculation to netCDF4-File
@@ -607,113 +627,113 @@ class RRTMG:
     
         with nc.Dataset(fname, "w") as outfile:
             outfile.createDimension("const", 1)
-            outfile.createDimension("level", self.__height_prof.size)
-            outfile.createDimension('cgrid', self.__clevel.size)
+            outfile.createDimension("level", self.__cloud['height_prof'].size)
+            outfile.createDimension('cgrid', self.__cloud['clevel'].size)
             
             height_out = outfile.createVariable("height", "f8", ("level", ))
             height_out.units = "km"
-            height_out[:] = self.__height_prof[:]
+            height_out[:] = self.__cloud['height_prof'][:]
             
             pressure_out = outfile.createVariable("pressure", "f8", ("level", ))
             pressure_out.units = "hPa"
-            pressure_out[:] = self.__pressure_prof[:]
+            pressure_out[:] = self.__cloud['pressure_prof'][:]
             
             temperature_out = outfile.createVariable("temperature", "f8", ("level", ))
             temperature_out.units = "K"
-            temperature_out[:] = self.__temperature_prof[:]
+            temperature_out[:] = self.__cloud['temperature_prof'][:]
             
             humidity_out = outfile.createVariable("humidity", "f8", ("level", ))
             humidity_out.units = "%"
-            humidity_out[:] = self.__humidity_prof[:]
+            humidity_out[:] = self.__cloud['humidity_prof'][:]
             
             lat_out = outfile.createVariable("latitude", "f8", ("const", ))
             lat_out.units = "DegN"
-            lat_out[:] = self.__latitude
+            lat_out[:] = self.__cloud['latitude']
     
             lon_out = outfile.createVariable("longitude", "f8", ("const", ))
             lon_out.units = "DegE"
-            lon_out[:] = self.__longitude
+            lon_out[:] = self.__cloud['longitude']
             
             sza_out = outfile.createVariable("solar_zenith_angle", "f8", ("const", ))
             sza_out.units = "Deg"
-            sza_out[:] = self.__sza
+            sza_out[:] = self.__cloud['sza']
             
             sic_out = outfile.createVariable("sea_ice_concentration", "f8", ("const", ))
             sic_out.units = "1"
-            sic_out[:] = self.__iceconc
+            sic_out[:] = self.__cloud['iceconc']
             
             albedo_dir_out = outfile.createVariable("sw_broadband_surface_albedo_direct_radiation", "f8", ("const", ))
             albedo_dir_out.units = "1"
-            albedo_dir_out[:] = self.__albedo
+            albedo_dir_out[:] = self.__cloud['albedo']
             
             albedo_diff_out = outfile.createVariable("sw_broadband_surface_albedo_diffuse_radiation", "f8", ("const", ))
             albedo_diff_out.units = "1"
-            albedo_diff_out[:] = self.__albedo
+            albedo_diff_out[:] = self.__cloud['albedo']
             
             cloud_out = outfile.createVariable("cloud_idx", "i4", ("cgrid", ))
-            cloud_out[:] = self.__clevel[:]
+            cloud_out[:] = self.__cloud['clevel'][:]
     
             cwp_out = outfile.createVariable("CWP", "f8", ("cgrid", ))
             cwp_out.units = "gm-2"
-            cwp_out[:] = self.__lwp+self.__iwp
+            cwp_out[:] = self.__cloud['cwp']
     
             rl_out = outfile.createVariable("rl", "f8", ("cgrid", ))
             rl_out.units = "um"
-            rl_out[:] = self.__rliq
+            rl_out[:] = self.__cloud['rliq']
     
             ri_out = outfile.createVariable("ri", "f8", ("cgrid", ))
             ri_out.units = "um"
-            ri_out[:] = self.__rice
+            ri_out[:] = self.__cloud['rice']
     
             wpi_out = outfile.createVariable("WPi", "f8", ("cgrid", ))
             wpi_out.units = "1"
-            wpi_out[:] = self.__wpi
+            wpi_out[:] = self.__cloud['wpi']
             
             clt_out = outfile.createVariable("cloud_fraction", "f8", ("cgrid", ))
             clt_out.units = "1"
-            clt_out[:] = self.__clt
+            clt_out[:] = self.__cloud['clt']
             
             co2_out = outfile.createVariable("co2_profile", "f8", ("level", ))
             co2_out.units = "ppmv"
-            co2_out[:] = self.__co2
+            co2_out[:] = self.__cloud['co2']
             
             n2o_out = outfile.createVariable("n2o_profile", "f8", ("level", ))
             n2o_out.units = "ppmv"
-            n2o_out[:] = self.__n2o
+            n2o_out[:] = self.__cloud['n2o']
     
             ch4_out = outfile.createVariable("ch4_profile", "f8", ("level", ))
             ch4_out.units = "ppmv"
-            ch4_out[:] = self.__ch4
+            ch4_out[:] = self.__cloud['ch4']
             
             diff_lwp_out = outfile.createVariable("diff_lwp", "f8", ("const", ))
-            diff_lwp_out[:] = self.__diff_lwp
+            diff_lwp_out[:] = self.__cloud['diff_lwp']
             
             flag_lwc_out = outfile.createVariable('flag_lwc', 'f8', ('const', ))
-            flag_lwc_out[:] = self.__flag_lwc
+            flag_lwc_out[:] = self.__cloud['flag_lwc']
             
             flag_iwc_out = outfile.createVariable('flag_iwc', 'f8', ('const', ))
-            flag_iwc_out[:] = self.__flag_iwc
+            flag_iwc_out[:] = self.__cloud['flag_iwc']
             
             flag_reff_out = outfile.createVariable('flag_reff', 'f8', ('const', ))
-            flag_reff_out[:] = self.__flag_reff
+            flag_reff_out[:] = self.__cloud['flag_reff']
             
             flag_reffice_out = outfile.createVariable('flag_reffice', 'f8', ('const', ))
-            flag_reffice_out[:] = self.__flag_reffice
+            flag_reffice_out[:] = self.__cloud['flag_reffice']
             
-            oob_liq = np.where((self.__rliq < 2.5) & \
-                               (self.__wpi < 1.0))[0].size
-            oob_liq+= np.where((self.__rliq >60.0) & \
-                               (self.__wpi < 1.0))[0].size
-            oob_ice = np.where((self.__rice < 13.0) & \
-                               (self.__wpi > 0.0))[0].size
-            oob_ice+= np.where((self.__rice > 131.0) & \
-                               (self.__wpi > 0.0))[0].size
+            oob_liq = np.where((self.__cloud['rliq'] < 2.5) & \
+                               (self.__cloud['wpi'] < 1.0))[0].size
+            oob_liq+= np.where((self.__cloud['rliq'] >60.0) & \
+                               (self.__cloud['wpi'] < 1.0))[0].size
+            oob_ice = np.where((self.__cloud['rice'] < 13.0) & \
+                               (self.__cloud['wpi'] > 0.0))[0].size
+            oob_ice+= np.where((self.__cloud['rice'] > 131.0) & \
+                               (self.__cloud['wpi'] > 0.0))[0].size
                     
             oob = outfile.createVariable("out_of_bounds", "i4", ("const", ))
             oob[:] = oob_liq + oob_ice
             
-            keys_sw = self.__fluxes_sw_all[0].keys()
-            keys_lw = self.__fluxes_lw_all[0].keys()
+            keys_sw = self.__cloud['fluxes_sw_all'][0].keys()
+            keys_lw = self.__cloud['fluxes_lw_all'][0].keys()
             clear_sw_out = [None for ii in range(len(keys_sw))]
             all_sw_out = [None for ii in range(len(keys_sw))]
             clear_sw_out_sum = [None for ii in range(len(keys_sw))]
@@ -738,16 +758,16 @@ class RRTMG:
                     all_sw_out_sum[ii].units = "Wm-2"
                     clear_sw_out_sum[ii].units = "Wm-2"
                     
-                all_sw_out_int = np.zeros(self.__fluxes_sw_all[0][keys_sw[0]].size)
-                clear_sw_out_int = np.zeros(self.__fluxes_sw_all[0][keys_sw[0]].size)
+                all_sw_out_int = np.zeros(self.__cloud['fluxes_sw_all'][0][keys_sw[0]].size)
+                clear_sw_out_int = np.zeros(self.__cloud['fluxes_sw_all'][0][keys_sw[0]].size)
 
                 for i in range(14):
-                    all_sw_out_int += np.array(self.__fluxes_sw_all[i][keys_sw[ii]])[::-1]
-                    clear_sw_out_int += np.array(self.__fluxes_sw_clear[i][keys_sw[ii]])[::-1]
+                    all_sw_out_int += np.array(self.__cloud['fluxes_sw_all'][i][keys_sw[ii]])[::-1]
+                    clear_sw_out_int += np.array(self.__cloud['fluxes_sw_clear'][i][keys_sw[ii]])[::-1]
                 all_sw_out[ii][:] = all_sw_out_int#np.array(self.__fluxes_sw_all[0][keys_sw][ii])[::-1]
                 clear_sw_out[ii][:] = clear_sw_out_int#np.array(self.__fluxes_sw_clear[0][keys_sw][ii])[::-1]
-                all_sw_out_sum[ii][:] = np.array(self.__fluxes_sw_all[-1][keys_sw[ii]])[::-1]
-                clear_sw_out_sum[ii][:] = np.array(self.__fluxes_sw_clear[-1][keys_sw[ii]])[::-1]
+                all_sw_out_sum[ii][:] = np.array(self.__cloud['fluxes_sw_all'][-1][keys_sw[ii]])[::-1]
+                clear_sw_out_sum[ii][:] = np.array(self.__cloud['fluxes_sw_clear'][-1][keys_sw[ii]])[::-1]
                 
             clear_lw_out = [None for ii in range(len(keys_lw))]
             all_lw_out = [None for ii in range(len(keys_lw))]
@@ -773,64 +793,16 @@ class RRTMG:
                     all_lw_out_sum[ii].units = "Wm-2"
                     clear_lw_out_sum[ii].units = "Wm-2"                    
                     
-                all_lw_out_int = np.zeros(self.__fluxes_lw_all[0][keys_lw[0]].size)
-                clear_lw_out_int = np.zeros(self.__fluxes_lw_all[0][keys_lw[0]].size)
+                all_lw_out_int = np.zeros(self.__cloud['fluxes_lw_all'][0][keys_lw[0]].size)
+                clear_lw_out_int = np.zeros(self.__cloud['fluxes_lw_all'][0][keys_lw[0]].size)
                 
 
                 for i in range(16):
-                    all_lw_out_int += np.array(self.__fluxes_lw_all[i][keys_lw[ii]])[::-1]
-                    clear_lw_out_int += np.array(self.__fluxes_lw_clear[i][keys_lw[ii]])[::-1]
+                    all_lw_out_int += np.array(self.__cloud['fluxes_lw_all'][i][keys_lw[ii]])[::-1]
+                    clear_lw_out_int += np.array(self.__cloud['fluxes_lw_clear'][i][keys_lw[ii]])[::-1]
                 all_lw_out[ii][:] = all_lw_out_int#np.array(self.__fluxes_sw_all[0][keys_sw][ii])[::-1]
                 clear_lw_out[ii][:] = clear_lw_out_int#np.array(self.__fluxes_sw_clear[0][keys_sw][ii])[::-1]
-                all_lw_out_sum[ii][:] = np.array(self.__fluxes_lw_all[-1][keys_lw[ii]])[::-1]
-                clear_lw_out_sum[ii][:] = np.array(self.__fluxes_lw_clear[-1][keys_lw[ii]])[::-1]
+                all_lw_out_sum[ii][:] = np.array(self.__cloud['fluxes_lw_all'][-1][keys_lw[ii]])[::-1]
+                clear_lw_out_sum[ii][:] = np.array(self.__cloud['fluxes_lw_clear'][-1][keys_lw[ii]])[::-1]
                 #all_lw_out[ii][:] = np.array(self.__fluxes_lw_all[0][keys_lw[ii]])[::-1]
                 #clear_lw_out[ii][:] = np.array(self.__fluxes_lw_clear[0][keys_lw[ii]])[::-1]
-
-if __name__ == '__main__':
-    path_retrievals = sys.argv[1]
-    path_input = sys.argv[2]
-    ssp_ice = sys.argv[3]
-    ssp_wat = sys.argv[4]
-    binary_lw = sys.argv[5]
-    binary_sw = sys.argv[6]
-    outpath = sys.argv[7]
-    if not os.path.exists(outpath):
-        os.mkdir(outpath)
-    os.chdir(outpath)
-    files = sorted(os.listdir(path_retrievals))
-    
-    model = RRTMG(binary_lw, binary_sw, [ssp_wat, ssp_ice])
-    out = {'Date': [], 'Latitude': [], 'Longitude': [], 'SZA': [], 'LWP': [], 'IWP': [], 'rliq': [], 'rice': [], 'red_chi_2': []}
-    for i in range(16):
-        out.update({'FTIR_integrate_{:02d}'.format(i): []})
-    for i in range(29):
-        out.update({'RRTMG_All_{:02d}'.format(i): []})
-        out.update({'RRTMG_Clear_{:02d}'.format(i): []})
-    for spec in files:
-        rrtmg_all = []
-        rrtmg_clear = []
-        ftir_all = []
-        model.read_tcwret(os.path.join(path_retrievals, spec), path_input)
-        try:
-            cparam, position, flux_all, flux_integrate, flux_clear, date = model.run()
-            out['Date'].append(date)
-            out['Latitude'].append(position['Latitude'])
-            out['Longitude'].append(position['Longitude'])
-            out['SZA'].append(position['SZA'])
-            out['LWP'].append(np.float(cparam['LWP(gm-2)'].flatten()))
-            out['IWP'].append(np.float(cparam['IWP(gm-2)'].flatten()))
-            out['rliq'].append(np.float(cparam['rliq(um)'].flatten()))
-            out['rice'].append(np.float(cparam['rice(um)'].flatten()))
-            out['red_chi_2'].append(np.float(cparam['red_chi_2'].flatten()))
-            for i in range(29):
-                out['RRTMG_All_{:02d}'.format(i)].append(flux_all[i])
-                out['RRTMG_Clear_{:02d}'.format(i)].append(flux_clear[i])
-
-            for i in range(16):
-                out['FTIR_integrate_{:02d}'.format(i)].append(flux_integrate[i])
-        except UnboundLocalError:
-            continue
-    
-    pd.DataFrame(out).to_csv("out.csv", index=False)
-    
