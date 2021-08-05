@@ -260,7 +260,7 @@ class RRTMG:
         if fname != "": plt.savefig(fname)
         plt.show()
             
-    def plot_atmosphere(self, fname=""):
+    def plot_atmosphere(self, fname="", ylim=[[0, 50], [1013, 0]]):
         fig, ax = plt.subplots(1, 2, figsize=(10, 5))
         ax[0].set_title("Height coordinates")
         ax[1].set_title("Pressure coordinates")
@@ -270,14 +270,27 @@ class RRTMG:
         ax[1].plot(self.__cloud['humidity_prof'], self.__cloud['pressure_prof'], label="Humidity")
         ax[1].plot(self.__cloud['temperature_prof'], self.__cloud['pressure_prof'], label="Temperature")
         ax[1].hlines(self.__cloud['pressure_prof'][self.__cloud['clevel']], 0, 300, label="Cloud")
-
-        ax[1].set_ylim([1013, 0])
+        ax[0].set_ylim(ylim[0])
+        ax[1].set_ylim(ylim[1])
         for i in range(2):
             ax[i].grid(True)
             ax[i].legend()
         if fname != "": plt.savefig(fname)
         plt.show()
 
+        
+    def temp_half_levels(self):
+        t_half = np.zeros(self.__cloud['temperature_prof'].size)
+        for i in enumerate(self.__cloud['temperature_prof']):
+            if i[0] == self.__cloud['temperature_prof'].size-1: break
+            plev_12 = 1/2*(self.__cloud['pressure_prof'][i[0]]+self.__cloud['pressure_prof'][i[0]+1])
+            frac_1 = (self.__cloud['pressure_prof'][i[0]]*(self.__cloud['pressure_prof'][i[0]+1]-plev_12))/(plev_12*(self.__cloud['pressure_prof'][i[0]+1]-self.__cloud['pressure_prof'][i[0]]))
+            frac_2 = self.__cloud['pressure_prof'][i[0]+1]*(plev_12 - self.__cloud['pressure_prof'][i[0]])/(plev_12*(self.__cloud['pressure_prof'][i[0]+1]-self.__cloud['pressure_prof'][i[0]]))
+            t_half[i[0]] = self.__cloud['temperature_prof'][i[0]] * frac_1 + self.__cloud['temperature_prof'][i[0]+1] * frac_2
+        t_half[-1] = 1/2*(t_half[-2]+self.__cloud['temperature_prof'][-1])
+        self.__cloud['temperature_prof'] = t_half
+        return self.__cloud['temperature_prof']
+    
     def read_trace_gases(self, height, co2, n2o, ch4, o3):
         co2_f = scipy.interpolate.interp1d(height, co2, fill_value="extrapolate")
         self.__cloud['co2'] = co2_f(self.__cloud['height_prof'])
