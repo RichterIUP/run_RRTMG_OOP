@@ -72,6 +72,31 @@ epsilon[np.array([5,6,7,8])] = 0.98
 for spec in files:
     try:
         model.read_cloudnet(os.path.join(path_retrievals, spec), pattern_fname="ERA5_%Y%m%d_%H%M%S.nc")
+        model.scale("rliq", 0.75)
+        model.scale("rice", 0.75)
+        #model.offset("clevel", 1)
+        #model.scale("cwp", 1.5)
+        tg = model.read_trace_gases(z, co2, n2o, ch4, o3_ppmv)
+        in_cld_rrtm = model.create_inputfile_cloud()
+        input_rrtm = model.create_inputfile_atm_terrestrial(cloud=0, semiss=epsilon, atm=atm)
+        model.run_RRTMG_terrestrial(clouds=False)
+        input_rrtm = model.create_inputfile_atm_terrestrial(cloud=2, semiss=epsilon, atm=atm)
+        model.run_RRTMG_terrestrial(clouds=True)
+        #input_aer = model.create_inputfile_aerosols_solar(level=[1], aot=[0.05], num_aer=1, iaod=0, issa=0, ipha=0, aerpar=[0.13, 1.0, 0.0], ssa=[0.780], phase=[0.7])
+        input_rrtm = model.create_inputfile_atm_solar(cloud=0, atm=atm, aerosols=0)
+        model.run_RRTMG_solar(clouds=False)
+        input_rrtm = model.create_inputfile_atm_solar(cloud=2, atm=atm, aerosols=0)
+        model.run_RRTMG_solar(clouds=True)
+        #model.write_results("/mnt/beegfs/user/phi.richter/REMOVE/OUTPUT/from_rrtmg_oop/{}/RRTMG_{}_scale_cwp_rliq_rice.nc".format(sys.argv[1], spec))#Scale
+        #model.write_results("/mnt/beegfs/user/phi.richter/REMOVE/OUTPUT/from_rrtmg_oop/{}/RRTMG_{}_scale_clevel_1.nc".format(sys.argv[1], spec))#Nomod
+        #model.write_results("/mnt/beegfs/user/phi.richter/REMOVE/OUTPUT/from_rrtmg_oop/{}/RRTMG_{}_scale_cwp_15.nc".format(sys.argv[1], spec))#Nomod
+        #model.write_results("/mnt/beegfs/user/phi.richter/REMOVE/OUTPUT/from_rrtmg_oop/{}/RRTMG_{}_aot_005.nc".format(sys.argv[1], spec))#Nomod
+        model.write_results("/mnt/beegfs/user/phi.richter/REMOVE/OUTPUT/from_rrtmg_oop/{}_scale_rl_075_ri_075/RRTMG_{}.nc".format(sys.argv[1], spec))
+    except Exception:
+        continue
+'''       
+    try:
+        model.read_cloudnet(os.path.join(path_retrievals, spec))#, pattern_fname="ERA5_%Y%m%d_%H%M%S.nc")
         #model.scale("rliq", 1.5)
         #model.scale("rice", 1.5)
         #model.offset("clevel", 1)
@@ -82,13 +107,39 @@ for spec in files:
         model.run_RRTMG_terrestrial(clouds=False)
         input_rrtm = model.create_inputfile_atm_terrestrial(cloud=2, semiss=epsilon, atm=atm)
         model.run_RRTMG_terrestrial(clouds=True)
-        input_rrtm = model.create_inputfile_atm_solar(cloud=0, atm=atm)
+        input_aer = model.create_inputfile_aerosols_solar(level=[1], aot=[0.1], num_aer=1, iaod=0, issa=0, ipha=0, aerpar=[0.13, 1.0, 0.0], ssa=[0.780], phase=[0.7])
+        input_rrtm = model.create_inputfile_atm_solar(cloud=0, atm=atm, aerosols=10)
         model.run_RRTMG_solar(clouds=False)
-        input_rrtm = model.create_inputfile_atm_solar(cloud=2, atm=atm)
+        input_rrtm = model.create_inputfile_atm_solar(cloud=2, atm=atm, aerosols=10)
         model.run_RRTMG_solar(clouds=True)
         #model.write_results("/mnt/beegfs/user/phi.richter/REMOVE/OUTPUT/from_rrtmg_oop/{}/RRTMG_{}_scale_cwp_rliq_rice.nc".format(sys.argv[1], spec))
         #model.write_results("/mnt/beegfs/user/phi.richter/REMOVE/OUTPUT/from_rrtmg_oop/{}/RRTMG_{}_scale_clevel_1.nc".format(sys.argv[1], spec))
         #model.write_results("/mnt/beegfs/user/phi.richter/REMOVE/OUTPUT/from_rrtmg_oop/{}/RRTMG_{}_scale_cwp_15.nc".format(sys.argv[1], spec))
-        model.write_results("/mnt/beegfs/user/phi.richter/REMOVE/OUTPUT/from_rrtmg_oop/{}/RRTMG_{}.nc".format(sys.argv[1], spec))
+        model.write_results("/mnt/beegfs/user/phi.richter/REMOVE/OUTPUT/from_rrtmg_oop/{}/RRTMG_{}_aot_01.nc".format(sys.argv[1], spec))
     except Exception:
         continue
+        
+    try:
+        model.read_cloudnet(os.path.join(path_retrievals, spec))#, pattern_fname="ERA5_%Y%m%d_%H%M%S.nc")
+        #model.scale("rliq", 1.5)
+        #model.scale("rice", 1.5)
+        #model.offset("clevel", 1)
+        #model.scale("cwp", 1.5)
+        tg = model.read_trace_gases(z, co2, n2o, ch4, o3_ppmv)
+        in_cld_rrtm = model.create_inputfile_cloud()
+        input_rrtm = model.create_inputfile_atm_terrestrial(cloud=0, semiss=epsilon, atm=atm)
+        model.run_RRTMG_terrestrial(clouds=False)
+        input_rrtm = model.create_inputfile_atm_terrestrial(cloud=2, semiss=epsilon, atm=atm)
+        model.run_RRTMG_terrestrial(clouds=True)
+        input_aer = model.create_inputfile_aerosols_solar(level=[1], aot=[0.15], num_aer=1, iaod=0, issa=0, ipha=0, aerpar=[0.13, 1.0, 0.0], ssa=[0.780], phase=[0.7])
+        input_rrtm = model.create_inputfile_atm_solar(cloud=0, atm=atm, aerosols=10)
+        model.run_RRTMG_solar(clouds=False)
+        input_rrtm = model.create_inputfile_atm_solar(cloud=2, atm=atm, aerosols=10)
+        model.run_RRTMG_solar(clouds=True)
+        #model.write_results("/mnt/beegfs/user/phi.richter/REMOVE/OUTPUT/from_rrtmg_oop/{}/RRTMG_{}_scale_cwp_rliq_rice.nc".format(sys.argv[1], spec))
+        #model.write_results("/mnt/beegfs/user/phi.richter/REMOVE/OUTPUT/from_rrtmg_oop/{}/RRTMG_{}_scale_clevel_1.nc".format(sys.argv[1], spec))
+        #model.write_results("/mnt/beegfs/user/phi.richter/REMOVE/OUTPUT/from_rrtmg_oop/{}/RRTMG_{}_scale_cwp_15.nc".format(sys.argv[1], spec))
+        model.write_results("/mnt/beegfs/user/phi.richter/REMOVE/OUTPUT/from_rrtmg_oop/{}/RRTMG_{}_aot_015.nc".format(sys.argv[1], spec))
+    except Exception:
+        continue
+'''
