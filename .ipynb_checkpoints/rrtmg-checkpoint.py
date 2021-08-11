@@ -288,7 +288,7 @@ class RRTMG:
             frac_2 = self.__cloud['pressure_prof'][i[0]+1]*(plev_12 - self.__cloud['pressure_prof'][i[0]])/(plev_12*(self.__cloud['pressure_prof'][i[0]+1]-self.__cloud['pressure_prof'][i[0]]))
             t_half[i[0]] = self.__cloud['temperature_prof'][i[0]] * frac_1 + self.__cloud['temperature_prof'][i[0]+1] * frac_2
         t_half[-1] = 1/2*(t_half[-2]+self.__cloud['temperature_prof'][-1])
-        self.__cloud['temperature_prof'] = t_half
+        self.__cloud['temperature_prof'][1:] = t_half[1:]
         return self.__cloud['temperature_prof']
     
     def read_trace_gases(self, height, co2, n2o, ch4, o3):

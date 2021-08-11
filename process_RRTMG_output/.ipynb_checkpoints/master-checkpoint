@@ -1,0 +1,23 @@
+#!/bin/bash
+#SBATCH -n 1
+#SBATCH -N 1
+#SBATCH -t 4320
+#SBATCH -p all
+#SBATCH --mem=9000
+#SBATCH --open-mode=append
+
+#export LBL_HOME=/home/phi.richter/radiative_transfer/lblrtm
+module unuse /home/eb/modules/all
+module unuse /home/eb/modules/LAMOS
+module use /home/eb/modules/_legacy/all
+module load Python
+module load netcdf4-python
+module load matplotlib
+
+sbatch read_RRTMG /home/phi.richter/SOFTWARE_PHD/run_RRTMG/RRTMG_Cloudnet_semiss /home/phi.richter/SOFTWARE_PHD/process_RRTMG_output/RRTMG_Cloudnet_semiss.csv
+
+sbatch read_RRTMG /home/phi.richter/SOFTWARE_PHD/run_RRTMG/RRTMG_Cloudnet_albedo_curry_aerosols /home/phi.richter/SOFTWARE_PHD/process_RRTMG_output/RRTMG_Cloudnet_albedo_curry_aerosols.csv
+
+sbatch read_RRTMG /home/phi.richter/SOFTWARE_PHD/run_RRTMG/RRTMG_Cloudnet_scale_cwp_20_aerosols /home/phi.richter/SOFTWARE_PHD/process_RRTMG_output/RRTMG_Cloudnet_scale_cwp_20_aerosols.csv
+
+sbatch read_RRTMG /home/phi.richter/SOFTWARE_PHD/run_RRTMG/RRTMG_Cloudnet_scale_cwp_20_albedo_curry /home/phi.richter/SOFTWARE_PHD/process_RRTMG_output/RRTMG_Cloudnet_scale_cwp_20_albedo_curry.csv

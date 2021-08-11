@@ -1,0 +1,228 @@
+/home/eb/software/Python/3.6.1-intel-2017a/lib/python3.6/site-packages/numpy-1.13.1-py3.6-linux-x86_64.egg/numpy/core/fromnumeric.py:2909: RuntimeWarning: Mean of empty slice.
+  out=out, **kwargs)
+/home/eb/software/Python/3.6.1-intel-2017a/lib/python3.6/site-packages/numpy-1.13.1-py3.6-linux-x86_64.egg/numpy/core/_methods.py:80: RuntimeWarning: invalid value encountered in double_scalars
+  ret = ret.dtype.type(ret / rcount)
+read_flux_files.py:126: RuntimeWarning: invalid value encountered in greater
+  cwp = np.sum(f.variables['CWP'][:])
+read_flux_files.py:128: RuntimeWarning: invalid value encountered in greater
+  wpi = np.mean(f.variables['WPi'][:])
+read_flux_files.py:131: RuntimeWarning: invalid value encountered in greater
+  rice = np.mean(f.variables['ri'][:])
+read_flux_files.py:136: RuntimeWarning: invalid value encountered in greater
+  out['lwp(gm-2)'].append(np.sum(f.variables['CWP'][:]*(1-f.variables['WPi'][:])))
+read_flux_files.py:137: RuntimeWarning: invalid value encountered in greater
+  out['iwp(gm-2)'].append(np.sum(f.variables['CWP'][:]*(f.variables['WPi'][:])))
+Traceback (most recent call last):
+  File "read_flux_files.py", line 313, in <module>
+    read_flux_files(sys.argv[1], sys.argv[2], 3, 4)
+  File "read_flux_files.py", line 299, in read_flux_files
+    pd.DataFrame(out).to_csv(fname_out, index=False)
+  File "/home/eb/software/Python/3.6.1-intel-2017a/lib/python3.6/site-packages/pandas-0.20.3-py3.6-linux-x86_64.egg/pandas/core/frame.py", line 1403, in to_csv
+    formatter.save()
+  File "/home/eb/software/Python/3.6.1-intel-2017a/lib/python3.6/site-packages/pandas-0.20.3-py3.6-linux-x86_64.egg/pandas/io/formats/format.py", line 1577, in save
+    compression=self.compression)
+  File "/home/eb/software/Python/3.6.1-intel-2017a/lib/python3.6/site-packages/pandas-0.20.3-py3.6-linux-x86_64.egg/pandas/io/common.py", line 385, in _get_handle
+    f = open(path_or_buf, mode, errors='replace')
+FileNotFoundError: [Errno 2] No such file or directory: '/mnt/beegfs/user/phi.richter/DATA_PHD/RRTMG/CSV_OUTPUT_CSV/from_rrtmg_oop/RRTMG_Cloudnet_cloud_plus_10.csv'
+/home/eb/software/Python/3.6.1-intel-2017a/lib/python3.6/site-packages/numpy-1.13.1-py3.6-linux-x86_64.egg/numpy/core/fromnumeric.py:2909: RuntimeWarning: Mean of empty slice.
+  out=out, **kwargs)
+/home/eb/software/Python/3.6.1-intel-2017a/lib/python3.6/site-packages/numpy-1.13.1-py3.6-linux-x86_64.egg/numpy/core/_methods.py:80: RuntimeWarning: invalid value encountered in double_scalars
+  ret = ret.dtype.type(ret / rcount)
+read_flux_files.py:126: RuntimeWarning: invalid value encountered in greater
+  cwp = np.sum(f.variables['CWP'][:])
+read_flux_files.py:128: RuntimeWarning: invalid value encountered in greater
+  wpi = np.mean(f.variables['WPi'][:])
+read_flux_files.py:131: RuntimeWarning: invalid value encountered in greater
+  rice = np.mean(f.variables['ri'][:])
+read_flux_files.py:136: RuntimeWarning: invalid value encountered in greater
+  out['lwp(gm-2)'].append(np.sum(f.variables['CWP'][:]*(1-f.variables['WPi'][:])))
+read_flux_files.py:137: RuntimeWarning: invalid value encountered in greater
+  out['iwp(gm-2)'].append(np.sum(f.variables['CWP'][:]*(f.variables['WPi'][:])))
+Traceback (most recent call last):
+  File "read_flux_files.py", line 313, in <module>
+    read_flux_files(sys.argv[1], sys.argv[2], 3, 4)
+  File "read_flux_files.py", line 299, in read_flux_files
+    pd.DataFrame(out).to_csv(fname_out, index=False)
+  File "/home/eb/software/Python/3.6.1-intel-2017a/lib/python3.6/site-packages/pandas-0.20.3-py3.6-linux-x86_64.egg/pandas/core/frame.py", line 1403, in to_csv
+    formatter.save()
+  File "/home/eb/software/Python/3.6.1-intel-2017a/lib/python3.6/site-packages/pandas-0.20.3-py3.6-linux-x86_64.egg/pandas/io/formats/format.py", line 1577, in save
+    compression=self.compression)
+  File "/home/eb/software/Python/3.6.1-intel-2017a/lib/python3.6/site-packages/pandas-0.20.3-py3.6-linux-x86_64.egg/pandas/io/common.py", line 385, in _get_handle
+    f = open(path_or_buf, mode, errors='replace')
+FileNotFoundError: [Errno 2] No such file or directory: '/mnt/beegfs/user/phi.richter/DATA_PHD/RRTMG/CSV_OUTPUT_CSV/from_rrtmg_oop/RRTMG_Cloudnet_cloud_plus_3.csv'
+/home/eb/software/Python/3.6.1-intel-2017a/lib/python3.6/site-packages/numpy-1.13.1-py3.6-linux-x86_64.egg/numpy/core/fromnumeric.py:2909: RuntimeWarning: Mean of empty slice.
+  out=out, **kwargs)
+/home/eb/software/Python/3.6.1-intel-2017a/lib/python3.6/site-packages/numpy-1.13.1-py3.6-linux-x86_64.egg/numpy/core/_methods.py:80: RuntimeWarning: invalid value encountered in double_scalars
+  ret = ret.dtype.type(ret / rcount)
+read_flux_files.py:126: RuntimeWarning: invalid value encountered in greater
+  cwp = np.sum(f.variables['CWP'][:])
+read_flux_files.py:128: RuntimeWarning: invalid value encountered in greater
+  wpi = np.mean(f.variables['WPi'][:])
+read_flux_files.py:131: RuntimeWarning: invalid value encountered in greater
+  rice = np.mean(f.variables['ri'][:])
+read_flux_files.py:136: RuntimeWarning: invalid value encountered in greater
+  out['lwp(gm-2)'].append(np.sum(f.variables['CWP'][:]*(1-f.variables['WPi'][:])))
+read_flux_files.py:137: RuntimeWarning: invalid value encountered in greater
+  out['iwp(gm-2)'].append(np.sum(f.variables['CWP'][:]*(f.variables['WPi'][:])))
+Traceback (most recent call last):
+  File "read_flux_files.py", line 313, in <module>
+    read_flux_files(sys.argv[1], sys.argv[2], 3, 4)
+  File "read_flux_files.py", line 299, in read_flux_files
+    pd.DataFrame(out).to_csv(fname_out, index=False)
+  File "/home/eb/software/Python/3.6.1-intel-2017a/lib/python3.6/site-packages/pandas-0.20.3-py3.6-linux-x86_64.egg/pandas/core/frame.py", line 1403, in to_csv
+    formatter.save()
+  File "/home/eb/software/Python/3.6.1-intel-2017a/lib/python3.6/site-packages/pandas-0.20.3-py3.6-linux-x86_64.egg/pandas/io/formats/format.py", line 1577, in save
+    compression=self.compression)
+  File "/home/eb/software/Python/3.6.1-intel-2017a/lib/python3.6/site-packages/pandas-0.20.3-py3.6-linux-x86_64.egg/pandas/io/common.py", line 385, in _get_handle
+    f = open(path_or_buf, mode, errors='replace')
+FileNotFoundError: [Errno 2] No such file or directory: '/mnt/beegfs/user/phi.richter/DATA_PHD/RRTMG/CSV_OUTPUT_CSV/from_rrtmg_oop/RRTMG_Cloudnet.csv'
+/home/eb/software/Python/3.6.1-intel-2017a/lib/python3.6/site-packages/numpy-1.13.1-py3.6-linux-x86_64.egg/numpy/core/fromnumeric.py:2909: RuntimeWarning: Mean of empty slice.
+  out=out, **kwargs)
+/home/eb/software/Python/3.6.1-intel-2017a/lib/python3.6/site-packages/numpy-1.13.1-py3.6-linux-x86_64.egg/numpy/core/_methods.py:80: RuntimeWarning: invalid value encountered in double_scalars
+  ret = ret.dtype.type(ret / rcount)
+read_flux_files.py:126: RuntimeWarning: invalid value encountered in greater
+  cwp = np.sum(f.variables['CWP'][:])
+read_flux_files.py:128: RuntimeWarning: invalid value encountered in greater
+  wpi = np.mean(f.variables['WPi'][:])
+read_flux_files.py:131: RuntimeWarning: invalid value encountered in greater
+  rice = np.mean(f.variables['ri'][:])
+read_flux_files.py:136: RuntimeWarning: invalid value encountered in greater
+  out['lwp(gm-2)'].append(np.sum(f.variables['CWP'][:]*(1-f.variables['WPi'][:])))
+read_flux_files.py:137: RuntimeWarning: invalid value encountered in greater
+  out['iwp(gm-2)'].append(np.sum(f.variables['CWP'][:]*(f.variables['WPi'][:])))
+Traceback (most recent call last):
+  File "read_flux_files.py", line 313, in <module>
+    read_flux_files(sys.argv[1], sys.argv[2], 3, 4)
+  File "read_flux_files.py", line 185, in read_flux_files
+    out['sfc_down_flux_all_lw(Wm-2)'].append(np.float(f.variables['all_lw_DOWNWARD FLUX_integrated'][SFC]))
+KeyError: 'all_lw_DOWNWARD FLUX_integrated'
+/home/eb/software/Python/3.6.1-intel-2017a/lib/python3.6/site-packages/numpy-1.13.1-py3.6-linux-x86_64.egg/numpy/core/fromnumeric.py:2909: RuntimeWarning: Mean of empty slice.
+  out=out, **kwargs)
+/home/eb/software/Python/3.6.1-intel-2017a/lib/python3.6/site-packages/numpy-1.13.1-py3.6-linux-x86_64.egg/numpy/core/_methods.py:80: RuntimeWarning: invalid value encountered in double_scalars
+  ret = ret.dtype.type(ret / rcount)
+read_flux_files.py:126: RuntimeWarning: invalid value encountered in greater
+  cwp = np.sum(f.variables['CWP'][:])
+read_flux_files.py:128: RuntimeWarning: invalid value encountered in greater
+  wpi = np.mean(f.variables['WPi'][:])
+read_flux_files.py:131: RuntimeWarning: invalid value encountered in greater
+  rice = np.mean(f.variables['ri'][:])
+read_flux_files.py:136: RuntimeWarning: invalid value encountered in greater
+  out['lwp(gm-2)'].append(np.sum(f.variables['CWP'][:]*(1-f.variables['WPi'][:])))
+read_flux_files.py:137: RuntimeWarning: invalid value encountered in greater
+  out['iwp(gm-2)'].append(np.sum(f.variables['CWP'][:]*(f.variables['WPi'][:])))
+Traceback (most recent call last):
+  File "read_flux_files.py", line 313, in <module>
+    read_flux_files(sys.argv[1], sys.argv[2], 3, 4)
+  File "read_flux_files.py", line 299, in read_flux_files
+    pd.DataFrame(out).to_csv(fname_out, index=False)
+  File "/home/eb/software/Python/3.6.1-intel-2017a/lib/python3.6/site-packages/pandas-0.20.3-py3.6-linux-x86_64.egg/pandas/core/frame.py", line 1403, in to_csv
+    formatter.save()
+  File "/home/eb/software/Python/3.6.1-intel-2017a/lib/python3.6/site-packages/pandas-0.20.3-py3.6-linux-x86_64.egg/pandas/io/formats/format.py", line 1577, in save
+    compression=self.compression)
+  File "/home/eb/software/Python/3.6.1-intel-2017a/lib/python3.6/site-packages/pandas-0.20.3-py3.6-linux-x86_64.egg/pandas/io/common.py", line 385, in _get_handle
+    f = open(path_or_buf, mode, errors='replace')
+FileNotFoundError: [Errno 2] No such file or directory: '/mnt/beegfs/user/phi.richter/DATA_PHD/RRTMG/CSV_OUTPUT_CSV/from_rrtmg_oop/RRTMG_Cloudnet_scale_cwp_20.csv'
+/home/eb/software/Python/3.6.1-intel-2017a/lib/python3.6/site-packages/numpy-1.13.1-py3.6-linux-x86_64.egg/numpy/core/fromnumeric.py:2909: RuntimeWarning: Mean of empty slice.
+  out=out, **kwargs)
+/home/eb/software/Python/3.6.1-intel-2017a/lib/python3.6/site-packages/numpy-1.13.1-py3.6-linux-x86_64.egg/numpy/core/_methods.py:80: RuntimeWarning: invalid value encountered in double_scalars
+  ret = ret.dtype.type(ret / rcount)
+read_flux_files.py:126: RuntimeWarning: invalid value encountered in greater
+  cwp = np.sum(f.variables['CWP'][:])
+read_flux_files.py:128: RuntimeWarning: invalid value encountered in greater
+  wpi = np.mean(f.variables['WPi'][:])
+read_flux_files.py:131: RuntimeWarning: invalid value encountered in greater
+  rice = np.mean(f.variables['ri'][:])
+read_flux_files.py:136: RuntimeWarning: invalid value encountered in greater
+  out['lwp(gm-2)'].append(np.sum(f.variables['CWP'][:]*(1-f.variables['WPi'][:])))
+read_flux_files.py:137: RuntimeWarning: invalid value encountered in greater
+  out['iwp(gm-2)'].append(np.sum(f.variables['CWP'][:]*(f.variables['WPi'][:])))
+Traceback (most recent call last):
+  File "read_flux_files.py", line 313, in <module>
+    read_flux_files(sys.argv[1], sys.argv[2], 3, 4)
+  File "read_flux_files.py", line 299, in read_flux_files
+    pd.DataFrame(out).to_csv(fname_out, index=False)
+  File "/home/eb/software/Python/3.6.1-intel-2017a/lib/python3.6/site-packages/pandas-0.20.3-py3.6-linux-x86_64.egg/pandas/core/frame.py", line 1403, in to_csv
+    formatter.save()
+  File "/home/eb/software/Python/3.6.1-intel-2017a/lib/python3.6/site-packages/pandas-0.20.3-py3.6-linux-x86_64.egg/pandas/io/formats/format.py", line 1577, in save
+    compression=self.compression)
+  File "/home/eb/software/Python/3.6.1-intel-2017a/lib/python3.6/site-packages/pandas-0.20.3-py3.6-linux-x86_64.egg/pandas/io/common.py", line 385, in _get_handle
+    f = open(path_or_buf, mode, errors='replace')
+FileNotFoundError: [Errno 2] No such file or directory: '/mnt/beegfs/user/phi.richter/DATA_PHD/RRTMG/CSV_OUTPUT_CSV/from_rrtmg_oop/RRTMG_Cloudnet_scale_ri_125.csv'
+/home/eb/software/Python/3.6.1-intel-2017a/lib/python3.6/site-packages/numpy-1.13.1-py3.6-linux-x86_64.egg/numpy/core/fromnumeric.py:2909: RuntimeWarning: Mean of empty slice.
+  out=out, **kwargs)
+/home/eb/software/Python/3.6.1-intel-2017a/lib/python3.6/site-packages/numpy-1.13.1-py3.6-linux-x86_64.egg/numpy/core/_methods.py:80: RuntimeWarning: invalid value encountered in double_scalars
+  ret = ret.dtype.type(ret / rcount)
+read_flux_files.py:126: RuntimeWarning: invalid value encountered in greater
+  cwp = np.sum(f.variables['CWP'][:])
+read_flux_files.py:128: RuntimeWarning: invalid value encountered in greater
+  wpi = np.mean(f.variables['WPi'][:])
+read_flux_files.py:131: RuntimeWarning: invalid value encountered in greater
+  rice = np.mean(f.variables['ri'][:])
+read_flux_files.py:136: RuntimeWarning: invalid value encountered in greater
+  out['lwp(gm-2)'].append(np.sum(f.variables['CWP'][:]*(1-f.variables['WPi'][:])))
+read_flux_files.py:137: RuntimeWarning: invalid value encountered in greater
+  out['iwp(gm-2)'].append(np.sum(f.variables['CWP'][:]*(f.variables['WPi'][:])))
+Traceback (most recent call last):
+  File "read_flux_files.py", line 313, in <module>
+    read_flux_files(sys.argv[1], sys.argv[2], 3, 4)
+  File "read_flux_files.py", line 299, in read_flux_files
+    pd.DataFrame(out).to_csv(fname_out, index=False)
+  File "/home/eb/software/Python/3.6.1-intel-2017a/lib/python3.6/site-packages/pandas-0.20.3-py3.6-linux-x86_64.egg/pandas/core/frame.py", line 1403, in to_csv
+    formatter.save()
+  File "/home/eb/software/Python/3.6.1-intel-2017a/lib/python3.6/site-packages/pandas-0.20.3-py3.6-linux-x86_64.egg/pandas/io/formats/format.py", line 1577, in save
+    compression=self.compression)
+  File "/home/eb/software/Python/3.6.1-intel-2017a/lib/python3.6/site-packages/pandas-0.20.3-py3.6-linux-x86_64.egg/pandas/io/common.py", line 385, in _get_handle
+    f = open(path_or_buf, mode, errors='replace')
+FileNotFoundError: [Errno 2] No such file or directory: '/mnt/beegfs/user/phi.richter/DATA_PHD/RRTMG/CSV_OUTPUT_CSV/from_rrtmg_oop/RRTMG_Cloudnet_scale_ri_15.csv'
+/home/eb/software/Python/3.6.1-intel-2017a/lib/python3.6/site-packages/numpy-1.13.1-py3.6-linux-x86_64.egg/numpy/core/fromnumeric.py:2909: RuntimeWarning: Mean of empty slice.
+  out=out, **kwargs)
+/home/eb/software/Python/3.6.1-intel-2017a/lib/python3.6/site-packages/numpy-1.13.1-py3.6-linux-x86_64.egg/numpy/core/_methods.py:80: RuntimeWarning: invalid value encountered in double_scalars
+  ret = ret.dtype.type(ret / rcount)
+read_flux_files.py:126: RuntimeWarning: invalid value encountered in greater
+  cwp = np.sum(f.variables['CWP'][:])
+read_flux_files.py:128: RuntimeWarning: invalid value encountered in greater
+  wpi = np.mean(f.variables['WPi'][:])
+read_flux_files.py:131: RuntimeWarning: invalid value encountered in greater
+  rice = np.mean(f.variables['ri'][:])
+read_flux_files.py:136: RuntimeWarning: invalid value encountered in greater
+  out['lwp(gm-2)'].append(np.sum(f.variables['CWP'][:]*(1-f.variables['WPi'][:])))
+read_flux_files.py:137: RuntimeWarning: invalid value encountered in greater
+  out['iwp(gm-2)'].append(np.sum(f.variables['CWP'][:]*(f.variables['WPi'][:])))
+Traceback (most recent call last):
+  File "read_flux_files.py", line 313, in <module>
+    read_flux_files(sys.argv[1], sys.argv[2], 3, 4)
+  File "read_flux_files.py", line 299, in read_flux_files
+    pd.DataFrame(out).to_csv(fname_out, index=False)
+  File "/home/eb/software/Python/3.6.1-intel-2017a/lib/python3.6/site-packages/pandas-0.20.3-py3.6-linux-x86_64.egg/pandas/core/frame.py", line 1403, in to_csv
+    formatter.save()
+  File "/home/eb/software/Python/3.6.1-intel-2017a/lib/python3.6/site-packages/pandas-0.20.3-py3.6-linux-x86_64.egg/pandas/io/formats/format.py", line 1577, in save
+    compression=self.compression)
+  File "/home/eb/software/Python/3.6.1-intel-2017a/lib/python3.6/site-packages/pandas-0.20.3-py3.6-linux-x86_64.egg/pandas/io/common.py", line 385, in _get_handle
+    f = open(path_or_buf, mode, errors='replace')
+FileNotFoundError: [Errno 2] No such file or directory: '/mnt/beegfs/user/phi.richter/DATA_PHD/RRTMG/CSV_OUTPUT_CSV/from_rrtmg_oop/RRTMG_Cloudnet_scale_rl_125.csv'
+/home/eb/software/Python/3.6.1-intel-2017a/lib/python3.6/site-packages/numpy-1.13.1-py3.6-linux-x86_64.egg/numpy/core/fromnumeric.py:2909: RuntimeWarning: Mean of empty slice.
+  out=out, **kwargs)
+/home/eb/software/Python/3.6.1-intel-2017a/lib/python3.6/site-packages/numpy-1.13.1-py3.6-linux-x86_64.egg/numpy/core/_methods.py:80: RuntimeWarning: invalid value encountered in double_scalars
+  ret = ret.dtype.type(ret / rcount)
+read_flux_files.py:126: RuntimeWarning: invalid value encountered in greater
+  cwp = np.sum(f.variables['CWP'][:])
+read_flux_files.py:128: RuntimeWarning: invalid value encountered in greater
+  wpi = np.mean(f.variables['WPi'][:])
+read_flux_files.py:131: RuntimeWarning: invalid value encountered in greater
+  rice = np.mean(f.variables['ri'][:])
+read_flux_files.py:136: RuntimeWarning: invalid value encountered in greater
+  out['lwp(gm-2)'].append(np.sum(f.variables['CWP'][:]*(1-f.variables['WPi'][:])))
+read_flux_files.py:137: RuntimeWarning: invalid value encountered in greater
+  out['iwp(gm-2)'].append(np.sum(f.variables['CWP'][:]*(f.variables['WPi'][:])))
+Traceback (most recent call last):
+  File "read_flux_files.py", line 313, in <module>
+    read_flux_files(sys.argv[1], sys.argv[2], 3, 4)
+  File "read_flux_files.py", line 299, in read_flux_files
+    pd.DataFrame(out).to_csv(fname_out, index=False)
+  File "/home/eb/software/Python/3.6.1-intel-2017a/lib/python3.6/site-packages/pandas-0.20.3-py3.6-linux-x86_64.egg/pandas/core/frame.py", line 1403, in to_csv
+    formatter.save()
+  File "/home/eb/software/Python/3.6.1-intel-2017a/lib/python3.6/site-packages/pandas-0.20.3-py3.6-linux-x86_64.egg/pandas/io/formats/format.py", line 1577, in save
+    compression=self.compression)
+  File "/home/eb/software/Python/3.6.1-intel-2017a/lib/python3.6/site-packages/pandas-0.20.3-py3.6-linux-x86_64.egg/pandas/io/common.py", line 385, in _get_handle
+    f = open(path_or_buf, mode, errors='replace')
+FileNotFoundError: [Errno 2] No such file or directory: '/mnt/beegfs/user/phi.richter/DATA_PHD/RRTMG/CSV_OUTPUT_CSV/from_rrtmg_oop/RRTMG_Cloudnet_scale_rl_15.csv'

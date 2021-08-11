@@ -1,0 +1,20 @@
+/home/eb/software/Python/3.6.1-intel-2017a/lib/python3.6/site-packages/numpy-1.13.1-py3.6-linux-x86_64.egg/numpy/core/_methods.py:112: RuntimeWarning: invalid value encountered in subtract
+  x = asanyarray(arr - arrmean)
+Traceback (most recent call last):
+  File "average.py", line 123, in <module>
+    filter_invalid=True)
+  File "average.py", line 64, in average
+    results = pd.read_csv(fname_in, parse_dates=['time'])
+  File "/home/eb/software/Python/3.6.1-intel-2017a/lib/python3.6/site-packages/pandas-0.20.3-py3.6-linux-x86_64.egg/pandas/io/parsers.py", line 655, in parser_f
+    return _read(filepath_or_buffer, kwds)
+  File "/home/eb/software/Python/3.6.1-intel-2017a/lib/python3.6/site-packages/pandas-0.20.3-py3.6-linux-x86_64.egg/pandas/io/parsers.py", line 405, in _read
+    parser = TextFileReader(filepath_or_buffer, **kwds)
+  File "/home/eb/software/Python/3.6.1-intel-2017a/lib/python3.6/site-packages/pandas-0.20.3-py3.6-linux-x86_64.egg/pandas/io/parsers.py", line 764, in __init__
+    self._make_engine(self.engine)
+  File "/home/eb/software/Python/3.6.1-intel-2017a/lib/python3.6/site-packages/pandas-0.20.3-py3.6-linux-x86_64.egg/pandas/io/parsers.py", line 985, in _make_engine
+    self._engine = CParserWrapper(self.f, **self.options)
+  File "/home/eb/software/Python/3.6.1-intel-2017a/lib/python3.6/site-packages/pandas-0.20.3-py3.6-linux-x86_64.egg/pandas/io/parsers.py", line 1605, in __init__
+    self._reader = parsers.TextReader(src, **kwds)
+  File "pandas/_libs/parsers.pyx", line 394, in pandas._libs.parsers.TextReader.__cinit__ (pandas/_libs/parsers.c:4209)
+  File "pandas/_libs/parsers.pyx", line 710, in pandas._libs.parsers.TextReader._setup_parser_source (pandas/_libs/parsers.c:8873)
+FileNotFoundError: File b'/mnt/beegfs/user/phi.richter/DATA_PHD/RRTMG/CSV/OUTPUT_CSV/from_rrtmg_oop/RRTMG_Cloudnet_scale_cwp_15.csv' does not exist

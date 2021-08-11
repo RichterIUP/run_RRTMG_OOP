@@ -1,0 +1,28 @@
+/home/eb/software/Python/3.6.1-intel-2017a/lib/python3.6/site-packages/numpy-1.13.1-py3.6-linux-x86_64.egg/numpy/core/fromnumeric.py:2909: RuntimeWarning: Mean of empty slice.
+  out=out, **kwargs)
+/home/eb/software/Python/3.6.1-intel-2017a/lib/python3.6/site-packages/numpy-1.13.1-py3.6-linux-x86_64.egg/numpy/core/_methods.py:80: RuntimeWarning: invalid value encountered in double_scalars
+  ret = ret.dtype.type(ret / rcount)
+read_flux_files.py:126: RuntimeWarning: invalid value encountered in greater
+  cwp = np.sum(f.variables['CWP'][:])
+read_flux_files.py:128: RuntimeWarning: invalid value encountered in greater
+  wpi = np.mean(f.variables['WPi'][:])
+read_flux_files.py:131: RuntimeWarning: invalid value encountered in greater
+  rice = np.mean(f.variables['ri'][:])
+read_flux_files.py:136: RuntimeWarning: invalid value encountered in greater
+  out['lwp(gm-2)'].append(np.sum(f.variables['CWP'][:]*(1-f.variables['WPi'][:])))
+read_flux_files.py:137: RuntimeWarning: invalid value encountered in greater
+  out['iwp(gm-2)'].append(np.sum(f.variables['CWP'][:]*(f.variables['WPi'][:])))
+/home/eb/software/Python/3.6.1-intel-2017a/lib/python3.6/site-packages/numpy-1.13.1-py3.6-linux-x86_64.egg/numpy/core/fromnumeric.py:2909: RuntimeWarning: Mean of empty slice.
+  out=out, **kwargs)
+/home/eb/software/Python/3.6.1-intel-2017a/lib/python3.6/site-packages/numpy-1.13.1-py3.6-linux-x86_64.egg/numpy/core/_methods.py:80: RuntimeWarning: invalid value encountered in double_scalars
+  ret = ret.dtype.type(ret / rcount)
+read_flux_files.py:126: RuntimeWarning: invalid value encountered in greater
+  cwp = np.sum(f.variables['CWP'][:])
+read_flux_files.py:128: RuntimeWarning: invalid value encountered in greater
+  wpi = np.mean(f.variables['WPi'][:])
+read_flux_files.py:131: RuntimeWarning: invalid value encountered in greater
+  rice = np.mean(f.variables['ri'][:])
+read_flux_files.py:136: RuntimeWarning: invalid value encountered in greater
+  out['lwp(gm-2)'].append(np.sum(f.variables['CWP'][:]*(1-f.variables['WPi'][:])))
+read_flux_files.py:137: RuntimeWarning: invalid value encountered in greater
+  out['iwp(gm-2)'].append(np.sum(f.variables['CWP'][:]*(f.variables['WPi'][:])))
