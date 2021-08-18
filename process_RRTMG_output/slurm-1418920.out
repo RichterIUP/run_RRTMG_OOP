@@ -1,0 +1,2 @@
+/home/eb/software/Python/3.6.1-intel-2017a/lib/python3.6/site-packages/numpy-1.13.1-py3.6-linux-x86_64.egg/numpy/core/_methods.py:112: RuntimeWarning: invalid value encountered in subtract
+  x = asanyarray(arr - arrmean)

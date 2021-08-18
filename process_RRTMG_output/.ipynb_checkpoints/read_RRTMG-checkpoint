@@ -14,7 +14,4 @@ module load Python
 module load netcdf4-python
 module load matplotlib
 
-python3 read_flux_files.py /home/phi.richter/RRTMG_input_nomod \
-/home/phi.richter/RRTMG_Cloudnet_half_level.csv
-
 python3 average.py

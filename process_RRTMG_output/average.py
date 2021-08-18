@@ -111,17 +111,17 @@ def average(fname_in, delta_t, fname_out, filter_invalid=True):
         results.to_csv("{}_AVG_{}.csv".format(fname_out, int(delta_t)))
         
 if __name__ == '__main__':
-    os.chdir("/home/phi.richter/SOFTWARE_PHD/process_RRTMG_output")
-    path_csv = "/home/phi.richter"
-    path_av = "/home/phi.richter"
+    os.chdir("/home/phi.richter")
+    #path_csv = "/home/phi.richter"
+    #path_av = "/home/phi.richter"
     delta_t = 60
     files = ["RRTMG_Cloudnet_half_level.csv"]
-    for file_ in files:
-        average(os.path.join(path_csv, file_), \
+    for file_ in [0]:#files:
+        average("RRTMG_half_level_aot_0_05_albedo_clear_sky/RRTMG_results.csv", \
                 delta_t, \
-                os.path.join(path_av, file_.split(".csv")[0]), \
+                "RRTMG_half_level_aot_0_05_albedo_clear_sky/RRTMG_results", \
                 filter_invalid=True)
-        average(os.path.join(path_csv, file_), \
+        average("RRTMG_half_level_aot_0_05_albedo_clear_sky/RRTMG_results.csv", \
                 delta_t, \
-                os.path.join(path_av, file_.split(".csv")[0]), \
+                "RRTMG_half_level_aot_0_05_albedo_clear_sky/RRTMG_results", \
                 filter_invalid=False)        

@@ -311,7 +311,7 @@ class RRTMG:
                 'ch4': self.__cloud['ch4'], \
                 'o3': self.__cloud['o3']}
 
-    def create_inputfile_atm_solar(self, aerosols=0, cloud=0, tprof=[-1], pprof=[-1], hprof=[-1], zprof=[-1], albedo=[0.99], atm="4444444"):
+    def create_inputfile_atm_solar(self, aerosols=0, cloud=0, tprof=[-1], pprof=[-1], hprof=[-1], zprof=[-1], albedo=[0.99], atm="4444444", use_albedo_par=False):
 
         temperature_prof = self.__cloud['temperature_prof'] if tprof[0] == -1 else tprof
         height_prof = self.__cloud['height_prof'] if zprof[0] == -1 else zprof
@@ -355,7 +355,10 @@ class RRTMG:
         RECORD_1_2_1 += "{:10.5f}".format(SOLCYCFRAC)
         IEMIS = 1 if len(albedo) == 1 else 2
         IREFLECT = 0
-        SEMISS = [self.__cloud['albedo']]
+        if use_albedo_par:
+            SEMISS = albedo
+        else:
+            SEMISS = [self.__cloud['albedo']]
     
         RECORD_1_4  = 11 * " " + "{:1d}".format(IEMIS)
         RECORD_1_4 += 2  * " " + "{:1d}".format(IREFLECT)
@@ -646,7 +649,11 @@ class RRTMG:
     def get_position(self):
         return {'Latitude': self.__cloud['latitude'], \
                 'Longitude': self.__cloud['longitude'], \
-                'SZA': self.__cloud['sza']}
+                'SZA': self.__cloud['sza'], 'Time': self.__cloud['date']}
+    
+    def get_cloud(self):
+        return self.__cloud
+
     
     def remove_rrtmg_files(self):
         files = ['tape6', 'TAPE6', 'TAPE7' 'INPUT_RRTM', 'IN_CLD_RRTM', 'OUTPUT_RRTM']
